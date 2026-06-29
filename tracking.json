@@ -1,0 +1,151 @@
+{
+  "project": "Android Process & Notification Manager",
+  "started": "2026-06-26",
+  "updated": "2026-06-29",
+  "phases": {
+    "1_project_scaffold": { "title": "Project Scaffold", "tasks": {
+      "1.1_create_directory_structure": { "title": "Create directory structure", "status": "completed", "notes": ["backend/{handlers,adb}, frontend/{js,css}, adb-binaries/{windows,linux,macos}, dist"], "decisions": [] },
+      "1.2_initialize_go_module": { "title": "Initialize Go module", "status": "completed", "notes": ["go mod init github.com/android-manager/backend, gin v1.12.0"], "decisions": [] },
+      "1.3_create_makefile": { "title": "Create Makefile", "status": "completed", "notes": ["dev, build-* targets"], "decisions": [] }
+    }},
+    "2_backend_adb_client": { "title": "Backend: ADB Client", "tasks": {
+      "2.1_create_adb_client": { "title": "Create backend/adb/client.go", "status": "completed", "notes": ["All ADB wrappers + IsSystemProcess"], "decisions": [] },
+      "2.2_define_data_structs": { "title": "Define data structs in types.go", "status": "completed", "notes": ["DeviceEntry, DeviceInfo, Process, App"], "decisions": [] }
+    }},
+    "3_backend_handlers": { "title": "Backend: Handlers", "tasks": {
+      "3.1_status_handler": { "title": "handlers/status.go", "status": "completed", "notes": [], "decisions": [] },
+      "3.2_device_handler": { "title": "handlers/device.go", "status": "completed", "notes": [], "decisions": [] },
+      "3.3_processes_handler": { "title": "handlers/processes.go", "status": "completed", "notes": ["GET + POST force-stop con 403 guard"], "decisions": [] },
+      "3.4_apps_handler": { "title": "handlers/apps.go", "status": "completed", "notes": ["GET + POST disable-notification con 403 guard"], "decisions": [] }
+    }},
+    "4_backend_main": { "title": "Backend: Main Entry Point", "tasks": {
+      "4.1_create_main_go": { "title": "Create backend/main.go", "status": "completed", "notes": ["v1: Gin + CORS + routes | v2: go:embed + NoRoute + sin CORS"], "decisions": ["Migrated to go:embed serving frontend from Go binary"] }
+    }},
+    "5_frontend_html": { "title": "Frontend: Base HTML", "tasks": {
+      "5.1_create_index_html": { "title": "frontend/index.html", "status": "completed", "notes": ["Tailwind CDN, 4-step wizard, dashboard with tabs, toast", "v2: search inputs, loading indicators, pagination containers, dashboard-scroll"], "decisions": [] },
+      "5.2_create_styles_css": { "title": "frontend/css/styles.css", "status": "completed", "notes": ["Step states, badges, toast styles, v2: loading, search, pagination, lang-btn, empty-state, dashboard-scroll"], "decisions": [] }
+    }},
+    "6_frontend_js": { "title": "Frontend: JavaScript Modules", "tasks": {
+      "6.1_create_i18n_js": { "title": "js/i18n.js", "status": "completed", "notes": ["EN+ES, default es, export const i18n", "v2: nuevas claves search/loading/empty/pagination, soporte data-i18n-placeholder"], "decisions": [] },
+      "6.2_create_api_js": { "title": "js/api.js", "status": "completed", "notes": ["Ruta relativa /api, export const api"], "decisions": [] },
+      "6.3_create_ui_js": { "title": "js/ui.js", "status": "completed", "notes": ["DOM helpers, v2: renderPagination, show/hideLoading, show/hideEmpty"], "decisions": [] },
+      "6.4_create_app_js": { "title": "js/app.js", "status": "completed", "notes": ["v1: step machine, polling, dashboard", "v2: estado caching processes/apps, búsqueda con debounce 300ms, paginación client-side (25 proc / 20 apps), loading states, toggle visual idioma, filterData/paginateData"], "decisions": ["Paginación y búsqueda 100% client-side — no necesita BD ni CSV; datos completos cacheados en state"] }
+    }},
+    "7_documentation": { "title": "Documentation", "tasks": {
+      "7.1_create_readme": { "title": "README.md", "status": "completed", "notes": ["Actualizado con info de go:embed, dev.sh, build"], "decisions": [] }
+    }},
+    "8_final_verification": { "title": "Final Verification", "tasks": {
+      "8.1_build_check": { "title": "Build check", "status": "completed", "notes": ["go build . exit 0"], "decisions": [] },
+      "8.2_route_smoke_test": { "title": "Route smoke test", "status": "completed", "notes": ["API endpoints OK, frontend HTML/JS/CSS servidos OK, HTTP 403 OK"], "decisions": [] },
+      "8.3_frontend_check": { "title": "Frontend check", "status": "completed", "notes": ["JS syntax OK"], "decisions": [] }
+    }},
+    "9_refactor_go_embed": { "title": "Refactor: go:embed + servir frontend desde Go", "tasks": {
+      "9.1_move_frontend": { "title": "Mover frontend/ dentro de backend/", "status": "completed", "notes": ["frontend/ → backend/frontend/ para que go:embed funcione"], "decisions": [] },
+      "9.2_embed_frontend": { "title": "Implementar go:embed en main.go", "status": "completed", "notes": ["embed.FS + fs.Sub + r.NoRoute con http.FileServer"], "decisions": ["Usar NoRoute en vez de StaticFS para evitar conflicto con rutas /api"] },
+      "9.3_remove_cors": { "title": "Eliminar gin-contrib/cors", "status": "completed", "notes": ["Mismo origen, no necesita CORS"], "decisions": [] },
+      "9.4_restore_es6_modules": { "title": "Restaurar import/export nativos en JS", "status": "completed", "notes": ["type='module', single script tag, sin globales"], "decisions": ["Ya no hay variables globales — ES6 modules nativos funcionan al servirse desde Go"] },
+      "9.5_update_api_js": { "title": "Ruta relativa en api.js", "status": "completed", "notes": ["BASE = '/api' en vez de 'http://localhost:8080/api'"], "decisions": [] },
+      "9.6_update_dev_sh": { "title": "Actualizar dev.sh", "status": "completed", "notes": ["Abre http://localhost:8080 en vez de file://"], "decisions": [] }
+    }},
+    "10_fixes_and_features": { "title": "Bugfixes y Features", "tasks": {
+      "10.1_parallelize_getapps": { "title": "Optimizar GetApps con goroutines", "status": "completed", "notes": ["10 goroutines concurrentes con semáforo para GetAppPermissions, sync.WaitGroup, reduce de N a N/10 comandos ADB"], "decisions": [] },
+      "10.2_loading_states": { "title": "Agregar loading indicators en tabs", "status": "completed", "notes": ["showLoading/hideLoading antes/después de fetch, bloquea doble carga con flag loading"], "decisions": [] },
+      "10.3_search_filter": { "title": "Búsqueda en tiempo real", "status": "completed", "notes": ["Input por tab, debounce 300ms, filtra por name/package/label, reset page a 0 al buscar"], "decisions": [] },
+      "10.4_pagination": { "title": "Paginación client-side", "status": "completed", "notes": ["25 items procesos, 20 items apps, botones Prev/Next, reset page si excede totalPages"], "decisions": ["Paginación client-side sin BD ni CSV — datos cacheados en state, filter + slice en JS"] },
+      "10.5_scroll_fixes": { "title": "Scroll vertical y horizontal", "status": "completed", "notes": ["dashboard-scroll con max-height: calc(100vh - 250px), overflow-y: auto, overflow-x: hidden"], "decisions": [] },
+      "10.6_lang_toggle_visual": { "title": "Feedback visual en botones de idioma", "status": "completed", "notes": ["Clases lang-btn-active (bg-blue-600) y lang-btn-inactive (bg-gray-700), actualizadas en click + init"], "decisions": [] },
+      "10.7_empty_state": { "title": "Mensaje cuando no hay resultados", "status": "completed", "notes": ["showEmpty/hideEmpty, oculta tabla cuando filtered + paginated data está vacía"], "decisions": [] }
+    }}
+  },
+    "11_ux_ui_overhaul": { "title": "UX/UI Overhaul y Bugfixes", "tasks": {
+      "11.1_fix_at_apply": { "title": "Reemplazar @apply con CSS nativo", "status": "completed", "notes": ["ROOT CAUSE: Tailwind CDN no procesa @apply — browser ignora. Se reemplazaron TODAS las directivas @apply con propiedades CSS estándar. Afecta .search-input, .pagination-*, .loading-indicator, .empty-state, .lang-btn-*, .toast, .tab-button.active, .step-*, .btn-action-*, .badge-*"], "decisions": ["No usar @apply nunca con Tailwind CDN; usar inline classes en HTML o CSS nativo"] },
+      "11.2_force_stop_verification": { "title": "Verificar que el proceso realmente muera", "status": "completed", "notes": ["backend/adb/client.go: nueva fn VerifyProcessStopped() que ejecuta ps -A y busca el nombre", "backend/handlers/processes.go: después de force-stop llama VerifyProcessStopped, devuelve {success, verified, message}", "frontend/app.js: toast muestra 'detenido' o 'podría seguir ejecutándose' según verified"] },
+      "11.3_filter_running_only": { "title": "Filtro 'Solo activos' en procesos", "status": "completed", "notes": ["Checkbox en filter-bar que filtra p.status === 'R' (running)", "app.js: filterRunning toggle en state, filterAndRenderProcesses aplica filtro antes de paginar", "i18n.js: claves filter.running EN/ES"] },
+      "11.4_tab_switch_refresh": { "title": "Refactor tab switching con carga forzada", "status": "completed", "notes": ["app.js: nueva fn switchTab() que maneja activación, ocultación, y llama loadProcesses/loadApps siempre", "Cada tab switch fuerza re-fetch con loading indicator visible", "Código duplicado de tab switching eliminado"] },
+      "11.5_responsive_container": { "title": "Contenedor responsive + diseño de tablas", "status": "completed", "notes": ["index.html: max-w-5xl → max-w-7xl, padding responsive sm:px-6, sm:py-6", "Tablas: nuevas clases .data-table, .table-container, .system-row, .btn-force-stop, .btn-disable-notif", "Responsive: permissions column oculta en sm, badges de status (RUN), hover en filas", "Cell padding responsive (sm breakpoint)"] },
+      "11.6_new_translations": { "title": "Traducciones de nuevas features", "status": "completed", "notes": ["filter.running, toast.stopped, toast.maybeStillRunning en EN y ES"] },
+      "11.7_status_legend": { "title": "Leyenda de estados de procesos", "status": "completed", "notes": ["Grilla con R=Running, S=Sleeping, I=Idle, Z=Zombie, T=Stopped, D=Uninterruptible", "HTML: status-legend debajo de paginación en processes tab", "CSS: .status-legend con flex-wrap, badges con code azul", "i18n: claves legend.* EN/ES", "ui.js: showLegend(), app.js: showLegend() tras loadProcesses"] },
+      "11.8_fix_apps_overflow": { "title": "Fix overflow horizontal en apps table", "status": "completed", "notes": ["ROOT CAUSE: max-width en td es ignorado por browser en table-layout:auto. Solución: table-layout:fixed en .apps-table + widths explícitos en th (col-package 32%, col-label 25%, col-permissions 30%, col-actions 13%)", "Contenido envuelto en div.cell-wrap con overflow:hidden + text-overflow:ellipsis + white-space:nowrap"] }
+    }},
+    "12_disconnect_handling": { "title": "Manejo de desconexión y refresh", "tasks": {
+      "12.1_serial_invalidation": { "title": "Invalidar serial cacheado al desconectar", "status": "completed", "notes": ["handler.go: ResolveSerial() ahora verifica siempre con adb devices que el serial cacheado sigue conectado. Si no, lo limpia y busca otro o devuelve \"\"", "Esto evita que comandos ADB intenten contra un serial desconectado y cascaden con 500"] },
+      "12.2_disconnect_banner": { "title": "Banner de desconexión con countdown", "status": "completed", "notes": ["HTML: #disconnect-banner con icono, texto, countdown ring", "CSS: .disconnect-banner rojo, .countdown-ring circular, animación slideDown", "app.js: showDisconnectBanner() con countdown 5→0, hideDisconnectBanner() en reconexión", "goToStep(0) automático si countdown llega a 0", "Clase .actions-disabled en dashboard durante desconexión"] },
+      "12.3_heartbeat_polling": { "title": "Heartbeat cada 2 segundos en dashboard", "status": "completed", "notes": ["startHeartbeat(): setInterval(checkConnection, 2000)", "checkConnection(): GET /api/status, si disconnected → banner, si reconnected → hide + refresh + toast", "stopHeartbeat() en leave dashboard", "Page Visibility API: pausa al ocultar tab, reanuda al mostrar", "Escalabilidad: stopHeartbeat al ocultar tab evita polling innecesario con múltiples usuarios"] },
+      "12.4_refresh_buttons": { "title": "Botón Refresh manual en cada tab", "status": "completed", "notes": ["HTML: #refresh-processes y #refresh-apps (↻) al lado del search input", "CSS: .refresh-btn con hover, active rotate, .spinning animation", "app.js: listeners que llaman loadProcesses/loadApps + animación spin 600ms"] },
+      "12.5_reconnection_flow": { "title": "Detección de reconexión automática", "status": "completed", "notes": ["checkConnection() detecta connected:true mientras banner activo → hide banner, refreshCurrentTab(), toast 'Dispositivo reconectado'"] }
+    }},
+    "13_game_notification_triple_lock": { "title": "Game Notification Triple-Lock", "tasks": {
+      "13.1_is_game_app": { "title": "IsGameApp detection function", "status": "completed", "notes": ["Added to client.go: package name segments (.game, .games, .gaming, game., games.), suffix match, known ad SDKs (unity, unreal, cocos, ironsource, applovin, vungle, admob, chartboost, tapjoy), permission combo VIBRATE+INTERNET"], "decisions": ["Case-insensitive matching via strings.ToLower"] },
+      "13.2_triple_lock_commands": { "title": "Triple-lock pm commands for games (Android 13+)", "status": "completed", "notes": ["Disable: appops deny + pm revoke + pm set-permission-flags user-set + pm clear-permission-flags user-fixed", "Enable: appops allow + pm grant + pm set-permission-flags user-set + pm clear-permission-flags user-fixed", "pm errors silently ignored (expected on Android 12-)", "Non-game apps use only appops (unchanged)"], "decisions": ["isGame bool parameter added to DisableNotifications/EnableNotifications signatures", "SetNotification helper removed (inlined)"] },
+      "13.3_get_apps_is_game": { "title": "Populate IsGame in GetApps", "status": "completed", "notes": ["pkgResult struct extended with isGame bool", "IsGameApp called in goroutine after permissions resolved", "App struct populated with IsGame field"], "decisions": [] },
+      "13.4_handler_is_game": { "title": "Handler reads is_game from request body", "status": "completed", "notes": ["Both DisableNotification and EnableNotification handlers accept is_game in JSON body and forward to ADB functions"], "decisions": ["Frontend sends is_game — backend doesn't re-derive it"] },
+      "13.5_frontend_api": { "title": "Frontend API sends is_game", "status": "completed", "notes": ["api.js: disableNotification and enableNotification accept isGame param, send as is_game in JSON body"], "decisions": [] },
+      "13.6_ui_game_badge": { "title": "Game badge in apps table", "status": "completed", "notes": ["ui.js: renderAppsTable shows 🎮 Game badge next to package name when a.is_game is true", "Button includes data-is-game attribute for click handler"], "decisions": [] },
+      "13.7_toast_game_locked": { "title": "Game lock confirmation toast", "status": "completed", "notes": ["app.js: disable-notif handler reads data-is-game, passes to api.disableNotification, appends gameLocked translation when isGame is true"], "decisions": [] },
+      "13.8_i18n_game": { "title": "Translations for game feature", "status": "completed", "notes": ["badges.game: '🎮 Game' / '🎮 Juego'", "toast.gameLocked: '— deep lock applied' / '— bloqueo profundo aplicado'"], "decisions": [] },
+      "13.9_css_badge_game": { "title": "Badge game CSS style", "status": "completed", "notes": [".badge-game with purple #7c3aed background"], "decisions": [] }
+    }},
+    "14_game_exclusion_list": { "title": "Game Detection — Exclusion List", "tasks": {
+      "14.1_exclusion_list": { "title": "Extensive known-non-game exclusion list", "status": "completed", "notes": ["Added ~400 known non-game package prefixes covering social, communication, browsers, Google apps, Microsoft, Adobe, streaming, banking, shopping, food delivery, productivity, health/fitness, maps/travel, utilities, Amazon, Samsung, Xiaomi, Huawei, OnePlus/Oppo/Vivo/Realme, OEMs, and VPN tools", "isKnownNonGame() called before all other game detection — if prefix matches, returns false immediately"], "decisions": ["Exclusion list uses HasPrefix to catch all variants (e.g. com.miui. catches all MIUI apps)", "Known non-game apps are excluded before any game detection logic runs"] },
+      "14.2_readme_update": { "title": "Update README with docs + usage guide", "status": "completed", "notes": ["Full documentation: game detection, exclusion list, triple-lock, usage guide"], "decisions": [] }
+    }},
+    "15_licensing_system": { "title": "Sistema de Licencias (DRM)", "tasks": {
+      "15.1_cloudflare_infra": { "title": "Cloudflare Worker + Supabase schema", "status": "completed", "notes": ["schema.sql: tabla licencias (codigo, usado, hw_id, fecha_activacion)", "worker.js: POST /activar y POST /revalidar con HMAC SHA-256"], "decisions": ["HMAC sobre codigo+hw_id+issued con secreto del Worker"] },
+      "15.2_activator": { "title": "Activator cross-platform (Win+Linux)", "status": "completed", "notes": ["fingerprint.go: wmic (Win) / /etc/machine-id (Linux) / MAC fallback", "main.go: servidor HTTP embebido, abre browser, formulario de activación", "activate.html: página embebida con go:embed"], "decisions": ["Web server embebido en vez de CLI para misma UX en Win y Linux"] },
+      "15.3_admin_panel": { "title": "Panel Admin FastAPI", "status": "completed", "notes": ["main.py: generar códigos, listar, ver stats. Conecta directo a Supabase", "Auth via X-API-Key header"], "decisions": ["FastAPI puro + httpx, sin dependencia a librería supabase"] },
+      "15.4_backend_licensing": { "title": "Paquete backend/licensing/ modular", "status": "completed", "notes": ["client.go: Validate() lee .lic y POST /revalidar al Worker", "middleware.go: BlockMiddleware para Gin (403 API / HTML error page)", "license-error.html: página embebida en el paquete"], "decisions": ["Paquete autocontenido y extraíble: copiar backend/licensing/ a cualquier proyecto Go"] },
+      "15.5_main_go_integration": { "title": "Integración mínima en main.go", "status": "completed", "notes": ["~10 líneas agregadas: validación al inicio, condicional middleware", "LICENSE_WORKER_URL env var, modo desarrollo si no está seteada"], "decisions": [] },
+      "15.6_build_distribution": { "title": "Build y distribución", "status": "completed", "notes": ["Makefile: targets build-activator-* con ldflags para Worker URL", "build-installer.sh: compila activator.exe antes de NSIS", "tpdroid.nsi: ejecuta activator.exe, aborta si exit code != 0", "build-linux.sh: genera tarball Linux con install.sh"], "decisions": ["Licencia se valida DENTRO del NSIS (primera capa) y al iniciar backend (segunda capa)"] },
+      "15.7_tests": { "title": "Tests de todas las fases", "status": "completed", "notes": ["Worker: 7 tests HMAC (node)", "Activator: 6 tests Go", "Licensing: 9 tests Go (hash + middleware)", "Admin: 3 tests Python (formato códigos)"], "decisions": [] }
+    }},
+    "16_email_activation": { "title": "Email durante activación", "tasks": {
+      "16.1_email_column": { "title": "Agregar columna email a schema.sql", "status": "completed", "notes": ["ALTER TABLE licencias ADD COLUMN email TEXT"], "decisions": [] },
+      "16.2_activator_email": { "title": "Campo email en activator (activate.html + main.go)", "status": "completed", "notes": ["Formulario con input email opcional, enviado como campo en payload JSON"], "decisions": [] },
+      "16.3_worker_email": { "title": "Worker acepte email en /activar", "status": "completed", "notes": ["Guarda email en Supabase si está presente"], "decisions": [] }
+    }},
+    "17_username_localstorage": { "title": "Username con localStorage", "tasks": {
+      "17.1_i18n_keys": { "title": "Claves i18n para prompt de username", "status": "completed", "notes": ["username.prompt, username.placeholder, username.save, username.error en EN/ES"], "decisions": [] },
+      "17.2_modal_html": { "title": "Modal para username en index.html", "status": "completed", "notes": ["Modal similar al de permisos, con input + botón guardar"], "decisions": [] },
+      "17.3_app_js_logic": { "title": "Lógica de username en app.js", "status": "completed", "notes": ["initApp carga username de localStorage, muestra modal si no existe, guarda en localStorage y navbar-username"], "decisions": [] }
+    }},
+    "18_apps_notif_filter": { "title": "Filtro de estado de notificaciones en Apps tab", "tasks": {
+      "18.1_html_filter": { "title": "Dropdown de filtro en apps filter-bar", "status": "completed", "notes": ["Select con opciones Todas / Notif. activas / Notif. desactivadas"], "decisions": [] },
+      "18.2_i18n_filter": { "title": "Claves i18n para filtro", "status": "completed", "notes": ["filter.notifAll, filter.notifOn, filter.notifOff"], "decisions": [] },
+      "18.3_app_js_filter": { "title": "Lógica de filtro en filterAndRenderApps", "status": "completed", "notes": ["Filtra state.apps.data por notifications_disabled según el valor del select"], "decisions": [] }
+    }},
+    "19_docs_expansion": { "title": "Expansión de documentación", "tasks": {
+      "19.1_game_detection_doc": { "title": "docs/game-detection.md", "status": "completed", "notes": ["Documentación de IsGameApp, exclusion list, triple-lock"], "decisions": [] },
+      "19.2_admin_panel_doc": { "title": "docs/admin-panel.md", "status": "completed", "notes": ["Documentación de FastAPI admin, endpoints, configuración"], "decisions": [] },
+      "19.3_activator_doc": { "title": "docs/activator.md", "status": "completed", "notes": ["Documentación del binario activator, fingerprint, build"], "decisions": [] }
+    }}
+  },
+  "errors_and_solutions": [
+    { "task": "8.2", "error": "ADB binary path wrong when running from backend/", "solution": "main.go detecta si cwd termina en 'backend' y usa el padre como project root" },
+    { "task": "5-6", "error": "ES6 modules no funcionan con file:// (CORS policy)", "solution": "Migrar a go:embed — frontend servido desde Go, mismo origen, ES6 modules nativos" },
+    { "task": "9.2", "error": "Gin StaticFS('/') crea catch-all que conflictúa con /api", "solution": "Usar r.NoRoute con http.FileServer en vez de r.StaticFS" },
+    { "task": "9.2", "error": "ANSI color codes en go:embed fs.FS causan HTTP 500", "solution": "Solo archivos UTF-8 planos en el embed, sin colores" },
+    { "task": "10.1", "error": "GetApps secuencial: N comandos dumpsys package tarda minutos", "solution": "10 goroutines concurrentes con semáforo + WaitGroup" },
+    { "task": "10.2-10.4", "error": "Sin loading state + sin feedback de carga = parece roto", "solution": "Loading indicators + búsqueda + paginación client-side" },
+    { "task": "10.6", "error": "Botón de idioma sin feedback visual de selección", "solution": "Clases lang-btn-active/lang-btn-inactive intercambiadas en cada click" },
+    { "task": "11.1", "error": "@apply no funciona con Tailwind CDN — causa input blanco y estilos rotos", "solution": "Reemplazar TODAS las directivas @apply con CSS properties nativas en styles.css" },
+    { "task": "11.2", "error": "Force-stop no confirmaba que el proceso murió realmente", "solution": "VerifyProcessStopped() ejecuta ps -A post-stop y verifica que el name ya no aparece" },
+    { "task": "11.8", "error": "Overflow horizontal en apps table: max-width en td no funciona en table-layout:auto", "solution": "table-layout:fixed + col widths + div.cell-wrap con overflow:hidden + text-overflow:ellipsis" },
+    { "task": "12.1", "error": "Serial cacheado nunca se invalida: comandos ADB contra dispositivo desconectado devuelven 500", "solution": "ResolveSerial() verifica el cache contra adb devices en cada llamada; si no está, lo limpia" },
+    { "task": "12.3", "error": "Sin heartbeat en dashboard: desconexión silenciosa sin feedback al usuario", "solution": "Polling /api/status cada 2s, banner con countdown 5s, goToStep(0) automático, Page Visibility API" },
+    { "task": "15.1", "error": "HMAC en Worker.js requiere Web Crypto API (solo disponible en runtime moderno)", "solution": "Usar crypto.subtle.importKey/sign con SHA-256, disponible en Cloudflare Workers y Node 15+" },
+    { "task": "15.2", "error": "fingerprint.go: windowsFingerprint retornaba solo string en vez de (string, error)", "solution": "Agregar , nil al return hash(...)" },
+    { "task": "15.4a", "error": "Middleware.go tenía dead code tras c.AbortWithStatusJSON", "solution": "Reestructurar: if /api → JSON, else → HTML page" },
+    { "task": "15.4b", "error": "main.go: else block sin closing brace + indentación incorrecta", "solution": "Reescribir main.go completo con estructura limpia: if !licenseValid { middleware } else { routes }" }
+  ],
+  "technical_decisions": [
+    { "decision": "go:embed para servir frontend", "context": "Eliminar dependencia de file://, permitir ES6 modules nativos, un solo binario", "detail": "Frontend movido a backend/frontend/, embebido con //go:embed, servido via http.FileServer en r.NoRoute" },
+    { "decision": "Sin CORS ni gin-contrib/cors", "context": "Frontend y API mismo origen (localhost:8080)", "detail": "Se eliminó la dependencia de gin-contrib/cors, no es necesaria con mismo origen" },
+    { "decision": "Ruta relativa /api en frontend", "context": "Mismo origen, no necesita URL absoluta", "detail": "api.js usa const BASE = '/api' en vez de 'http://localhost:8080/api'" },
+    { "decision": "Handler struct pattern", "context": "Handlers comparten ADB path y device serial", "detail": "handlers/handler.go con Handler struct, New() constructor, ResolveSerial()" },
+    { "decision": "IsSystemProcess exportado", "context": "Requerido por skills.md para handlers", "detail": "Definido en adb/client.go como IsSystemProcess (con I mayúscula)" },
+    { "decision": "Paginación y búsqueda client-side", "context": "No necesita BD ni CSV, datos completos caben en memoria JS", "detail": "app.js mantiene state.processes.data y state.apps.data, filtra con filterData() y pagina con paginateData() en el frontend" },
+    { "decision": "Goroutines con semáforo para permisos", "context": "GetPermissions es el bottleneck (N comandos ADB)", "detail": "10 goroutines concurrentes con channel semáforo (chan struct{}, 10) para no saturar ADB" },
+    { "decision": "No usar @apply en CSS con Tailwind CDN", "context": "Tailwind CDN no procesa @apply — solo lee clases inline en HTML", "detail": "Todos los estilos en styles.css usan propiedades CSS estándar. Las clases de Tailwind se usan inline en index.html." },
+    { "decision": "table-layout:fixed para truncar en tablas", "context": "max-width en td no funciona con table-layout:auto en browsers", "detail": "Se usa table-layout:fixed + widths % en th + div.cell-wrap con overflow:hidden/text-overflow:ellipsis para truncar contenido largo" }
+  ]
+}

@@ -1,0 +1,7 @@
+name = "tpdroid-licencias"
+main = "worker.js"
+compatibility_date = "2026-06-28"
+workers_dev = true
+
+[vars]
+SUPABASE_URL = "https://udkevgfquhlyraanfwfl.supabase.co"

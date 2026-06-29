@@ -1,0 +1,23 @@
+# Entornos y configuración
+.env
+venv/
+.venv/
+
+# Carpetas de caché y sistemas
+__pycache__/
+.pytest_cache/
+.DS_Store
+
+# Carpetas generadas automáticamente por herramientas (ver imagen.png)
+dist/
+.wrangler/
+.agent/
+
+# Archivos de build temporales (si los generas manualmente)
+*.zip
+*.tar.gz
+
+# Archivos de texto plano
+*.txt
+*.doc
+*.docs

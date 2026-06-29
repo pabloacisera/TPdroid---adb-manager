@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="app.title">TPdroid</title>
+  <link rel="icon" type="image/png" href="tpdroid-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/786e460efc.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand">
+        <img class="navbar-logo" src="tpdroid-icon-without-background.png" alt="">
+        <span class="navbar-title" data-i18n="app.title">TPdroid</span>
+      </div>
+      <div class="navbar-right">
+        <div class="navbar-user">
+          <span>👤</span>
+          <span class="navbar-username">Usuario</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="lang-en" class="px-3 py-1 rounded text-sm font-medium lang-btn-inactive">EN</button>
+          <button id="lang-es" class="px-3 py-1 rounded text-sm font-medium lang-btn-active">ES</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main class="flex-1">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+
+    <!-- Step Indicator -->
+    <div class="flex items-center justify-center gap-2 mb-8">
+      <div class="step-indicator" data-state="active" data-step="1">
+        <div class="step-circle" id="step-prepare-indicator">1</div>
+        <span class="step-label text-xs" data-i18n="steps.prepare.short">Prepare</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-indicator" data-state="pending" data-step="2">
+        <div class="step-circle" id="step-connect-indicator">2</div>
+        <span class="step-label text-xs" data-i18n="steps.connect.short">Connect</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-indicator" data-state="pending" data-step="3">
+        <div class="step-circle" id="step-authorize-indicator">3</div>
+        <span class="step-label text-xs" data-i18n="steps.authorize.short">Authorize</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-indicator" data-state="pending" data-step="4">
+        <div class="step-circle" id="step-dashboard-indicator">4</div>
+        <span class="step-label text-xs" data-i18n="steps.dashboard.short">Dashboard</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Prepare -->
+    <div id="step-prepare" class="step-content">
+      <div class="bg-gray-800 rounded-xl p-8 max-w-2xl mx-auto">
+        <h2 class="text-xl font-semibold mb-4" data-i18n="steps.prepare.title">Prepare your phone</h2>
+        <ol class="list-decimal list-inside space-y-3 text-gray-300 mb-6">
+          <li data-i18n="steps.prepare.instruction1">Go to Settings → About Phone → tap "Build Number" 7 times</li>
+          <li data-i18n="steps.prepare.instruction2">Go to Settings → Developer Options → enable "USB Debugging"</li>
+          <li data-i18n="steps.prepare.instruction3">Keep your phone unlocked</li>
+        </ol>
+        <button id="btn-prepare" class="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition" data-i18n="steps.prepare.cta">
+          My phone is ready
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Connect -->
+    <div id="step-connect" class="step-content hidden">
+      <div class="bg-gray-800 rounded-xl p-8 max-w-2xl mx-auto text-center">
+        <h2 class="text-xl font-semibold mb-4" data-i18n="steps.connect.title">Connect via USB</h2>
+        <p class="text-gray-300 mb-6" data-i18n="steps.connect.instruction">Connect your phone to this computer with a USB cable.</p>
+        <div id="step-connect-status" class="flex flex-col items-center gap-4">
+          <div class="animate-pulse text-blue-400 text-lg" data-i18n="steps.connect.waiting">Waiting for device...</div>
+          <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <div id="step-connect-error" class="hidden mt-4">
+          <p class="text-red-400 mb-4" data-i18n="errors.timeout">No device detected after 60 seconds.</p>
+          <button id="btn-retry-connect" class="py-2 px-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium" data-i18n="actions.retry">Retry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Authorize -->
+    <div id="step-authorize" class="step-content hidden">
+      <div class="bg-gray-800 rounded-xl p-8 max-w-2xl mx-auto text-center">
+        <h2 class="text-xl font-semibold mb-4" data-i18n="steps.authorize.title">Authorize the connection</h2>
+        <p class="text-gray-300 mb-6" data-i18n="steps.authorize.instruction">Check your phone screen and tap "Allow USB Debugging".</p>
+        <div id="step-authorize-status" class="flex flex-col items-center gap-4">
+          <div class="animate-pulse text-blue-400 text-lg" data-i18n="steps.authorize.waiting">Waiting for authorization...</div>
+          <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <div id="step-authorize-error" class="hidden mt-4">
+          <p class="text-red-400 mb-4" data-i18n="errors.timeout">Authorization timed out.</p>
+          <button id="btn-retry-authorize" class="py-2 px-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium" data-i18n="actions.retry">Retry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disconnect Banner -->
+    <div id="disconnect-banner" class="disconnect-banner hidden">
+      <div class="flex items-center gap-3">
+        <span class="text-lg">📱</span>
+        <span data-i18n="device.disconnected">Device disconnected</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="countdown-ring">
+          <span id="disconnect-countdown">5</span>
+        </span>
+        <span class="text-sm opacity-80" data-i18n="device.reconnecting">Reconnecting...</span>
+      </div>
+    </div>
+
+    <!-- Step 4: Dashboard -->
+    <div id="step-dashboard" class="step-content hidden">
+      <div class="bg-gray-800 rounded-xl p-4 sm:p-6 dashboard-scroll">
+        <!-- Tabs -->
+        <div class="flex gap-4 border-b border-gray-700 mb-4 sm:mb-6 overflow-x-auto">
+          <button id="tab-processes" class="tab-button active py-2 px-3 sm:px-4 font-medium text-sm sm:text-base whitespace-nowrap" data-i18n="tabs.processes">Processes</button>
+          <button id="tab-apps" class="tab-button py-2 px-3 sm:px-4 font-medium text-sm sm:text-base whitespace-nowrap" data-i18n="tabs.apps">Apps &amp; Notifications</button>
+          <button id="tab-ads" class="tab-button py-2 px-3 sm:px-4 font-medium text-sm sm:text-base whitespace-nowrap" data-i18n="tabs.ads">Ads y Notificaciones</button>
+        </div>
+
+        <!-- Processes Tab -->
+        <div id="tab-processes-content" class="tab-content">
+          <div class="filter-bar">
+            <input type="text" id="search-processes" class="search-input flex-1 min-w-0" data-i18n-placeholder="search.processes.placeholder" placeholder="Search processes...">
+            <button id="refresh-processes" class="refresh-btn" title="Refresh">↻</button>
+            <label class="filter-toggle flex-shrink-0">
+              <input type="checkbox" id="filter-running">
+              <span data-i18n="filter.running">Running only</span>
+            </label>
+          </div>
+          <div id="status-legend" class="status-legend hidden">
+            <span class="legend-label" data-i18n="legend.status">Status:</span>
+            <span class="legend-item"><code>R</code> <span data-i18n="legend.r">Running</span></span>
+            <span class="legend-item"><code>S</code> <span data-i18n="legend.s">Sleeping</span></span>
+            <span class="legend-item"><code>I</code> <span data-i18n="legend.i">Idle</span></span>
+            <span class="legend-item"><code>Z</code> <span data-i18n="legend.z">Zombie</span></span>
+            <span class="legend-item"><code>T</code> <span data-i18n="legend.t">Stopped</span></span>
+            <span class="legend-item"><code>D</code> <span data-i18n="legend.d">Uninterruptible</span></span>
+          </div>
+          <div id="loading-processes" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <span data-i18n="loading.processes">Loading processes...</span>
+          </div>
+          <div id="empty-processes" class="empty-state hidden" data-i18n="empty.processes">No processes found.</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th data-i18n="table.pid">PID</th>
+                  <th data-i18n="table.name">Name</th>
+                  <th data-i18n="table.uid">User</th>
+                  <th data-i18n="table.status">Status</th>
+                  <th data-i18n="table.actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="processes-tbody"></tbody>
+            </table>
+          </div>
+          <div id="pagination-processes" class="pagination hidden"></div>
+        </div>
+
+        <!-- Apps Tab -->
+        <div id="tab-apps-content" class="tab-content hidden">
+          <div class="global-action-bar">
+            <button id="btn-disable-all-apps-notif" class="btn-global-action btn-global-danger" data-i18n="actions.disableAllNotif">Desactivar todas las notificaciones</button>
+            <span class="global-action-hint" data-i18n="actions.disableAllNotifHint">Desactiva las notificaciones de todas las apps no-sistema que aún las tengan activas</span>
+          </div>
+          <div class="filter-bar">
+            <input type="text" id="search-apps" class="search-input flex-1 min-w-0" data-i18n-placeholder="search.apps.placeholder" placeholder="Search apps...">
+            <button id="refresh-apps" class="refresh-btn" title="Refresh">↻</button>
+            <select id="filter-notif-status" class="search-input" style="width: auto; min-width: 140px; flex: none;">
+              <option value="all" data-i18n="filter.notifAll">All</option>
+              <option value="on" data-i18n="filter.notifOn">Notifications On</option>
+              <option value="off" data-i18n="filter.notifOff">Notifications Off</option>
+            </select>
+          </div>
+          <div id="loading-apps" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <span data-i18n="loading.apps">Loading apps...</span>
+          </div>
+          <div id="empty-apps" class="empty-state hidden" data-i18n="empty.apps">No apps found.</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th data-i18n="table.package">Package</th>
+                  <th data-i18n="table.label">Label</th>
+                  <th class="hidden sm:table-cell" data-i18n="table.notifStatus">Notificaciones</th>
+                  <th class="hidden lg:table-cell" data-i18n="table.permissions">Permissions</th>
+                  <th data-i18n="table.actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="apps-tbody"></tbody>
+            </table>
+          </div>
+          <div id="pagination-apps" class="pagination hidden"></div>
+        </div>
+
+        <!-- TAB: Ad & Notification Scanner -->
+        <div id="tab-ads-content" class="tab-content hidden">
+          <div class="ads-legend-box">
+            <span class="ads-legend-icon">☢</span>
+            <div class="ads-legend-text" data-i18n="ads.fullBlockLegend">El botón ☢ aplica un bloqueo TOTAL de todas las notificaciones de esa app, no solo el canal detectado. Útil cuando el bloqueo por canal no es suficiente. En navegadores, esto corta todos los avisos del browser.</div>
+          </div>
+          <div class="global-action-bar">
+            <button id="btn-block-chrome-total" class="btn-global-action btn-global-danger" data-i18n="ads.blockChromeTotal">Bloqueo total de Chrome</button>
+            <span class="global-action-hint" data-i18n="ads.blockChromeTotalHint">Bloquea todos los canales de notificación de Chrome y sus variantes (Beta, Dev, Canary)</span>
+          </div>
+          <div class="filter-bar">
+            <button id="scan-ads" class="btn-action btn-force-stop" data-i18n="ads.scanBtn">Escanear ahora</button>
+            <button id="refresh-ads" class="btn-action btn-ads-refresh" title="Refresh">↻</button>
+          </div>
+          <p class="text-gray-400 text-sm mb-4" data-i18n="ads.description"></p>
+          <div id="loading-ads" class="loading-indicator hidden">
+            <div class="spinner"></div>
+          </div>
+          <div id="empty-ads" class="empty-state hidden" data-i18n="ads.empty">No se detectaron fuentes intrusivas.</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th data-i18n="ads.colPackage">Paquete / App</th>
+                  <th data-i18n="ads.colReasons">Detectado ahora</th>
+                  <th data-i18n="ads.colChannels">Canales / Tags</th>
+                  <th data-i18n="ads.colStatus">Estado</th>
+                  <th data-i18n="ads.colActions">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ads-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions Modal -->
+    <div id="perms-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="perms-modal-title"></h3>
+          <button id="perms-modal-close" class="modal-close">&times;</button>
+        </div>
+        <div id="perms-modal-body" class="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Channels Modal -->
+    <div id="channels-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="channels-modal-title"></h3>
+          <button id="channels-modal-close" class="modal-close">&times;</button>
+        </div>
+        <div id="channels-modal-body" class="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Username Modal -->
+    <div id="username-modal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-width: 24rem;">
+        <div class="modal-header">
+          <h3 data-i18n="username.prompt">Welcome! What should we call you?</h3>
+          <button id="username-modal-close" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <input type="text" id="username-input" class="search-input" data-i18n-placeholder="username.placeholder" placeholder="Your name" style="margin-bottom: 1rem;">
+          <button id="username-save" class="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition" data-i18n="username.save">Save</button>
+          <p id="username-error" class="text-red-400 text-sm mt-2 hidden" data-i18n="username.error">Please enter a name</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <i class="fas fa-bolt text-blue-400"></i>
+        <span>TPdroid</span>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="https://wa.me/5493482278591" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-whatsapp"></i> +54 9 3482 278 591
+        </a>
+        <a class="footer-link" href="mailto:support-tpdroid@artisandevs.site">
+          <i class="far fa-envelope"></i> support-tpdroid@artisandevs.site
+        </a>
+        <a class="footer-link" href="https://instagram.com/artisandevs27" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-instagram"></i> @ArtisanDevs
+        </a>
+        <a class="footer-link" href="https://github.com/pabloacisera/TPdroid---adb-manager.git" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github"></i> GitHub
+        </a>
+      </div>
+      <div class="footer-dev">
+        <i class="fas fa-code text-gray-500"></i> ArtisanDevs
+      </div>
+    </div>
+  </footer>

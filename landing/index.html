@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">TPDroid — Android Process & Notification Manager</title>
+<link rel="icon" type="image/png" href="tpdroid-icon.png">
+<script src="https://kit.fontawesome.com/786e460efc.js" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #111827; color: #D1D5DB; line-height: 1.6; min-height: 100vh; }
+a { color: #60A5FA; text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { color: #F9FAFB; font-weight: 600; line-height: 1.3; }
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.75rem; margin-bottom: 1.5rem; }
+h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+h4 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+p { margin-bottom: 1rem; }
+code, pre { font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1F2937; border: 1px solid #4B5563; border-radius: 6px; font-size: 0.875rem; }
+code { padding: 0.15em 0.4em; }
+pre { padding: 1rem; overflow-x: auto; margin-bottom: 1rem; }
+pre code { background: none; border: none; padding: 0; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem; }
+th, td { border: 1px solid #4B5563; padding: 0.6rem 0.75rem; text-align: left; }
+th { background: #1F2937; color: #F9FAFB; font-weight: 600; }
+tr:nth-child(even) { background: rgba(31, 41, 55, 0.5); }
+ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+li { margin-bottom: 0.25rem; }
+strong { color: #F9FAFB; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+.btn { display: inline-block; padding: 0.65rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #2563EB; color: #fff; }
+.btn-primary:hover { background: #1D4ED8; }
+.btn-outline { background: transparent; color: #60A5FA; border: 1px solid #60A5FA; }
+.btn-outline:hover { background: rgba(96, 165, 250, 0.1); }
+.badge { display: inline-block; padding: 0.2em 0.6em; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.badge-blue { background: rgba(96, 165, 250, 0.15); color: #60A5FA; }
+.badge-green { background: rgba(74, 222, 128, 0.15); color: #4ADE80; }
+.badge-orange { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+.badge-red { background: rgba(248, 113, 113, 0.15); color: #F87171; }
+.text-blue { color: #60A5FA; }
+.text-green { color: #4ADE80; }
+.text-orange { color: #fb923c; }
+.text-red { color: #F87171; }
+.text-muted { color: #9CA3AF; }
+.section { padding: 4rem 0; }
+.section-alt { background: rgba(31, 41, 55, 0.3); }
+/* Navbar */
+.navbar { background: #1F2937; border-bottom: 1px solid #4B5563; position: sticky; top: 0; z-index: 100; }
+.navbar .container { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.navbar-brand { font-size: 1.25rem; font-weight: 700; color: #60A5FA; display: flex; align-items: center; gap: 0.5rem; }
+.navbar-brand img { height: 28px; width: 28px; }
+.navbar-links { display: flex; gap: 1.5rem; align-items: center; }
+.navbar-links a { color: #D1D5DB; font-size: 0.9rem; }
+.navbar-links a:hover { color: #60A5FA; text-decoration: none; }
+.lang-toggle { background: none; border: 1px solid #4B5563; color: #D1D5DB; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.lang-toggle:hover { border-color: #60A5FA; color: #60A5FA; }
+/* Hero */
+.hero { text-align: center; padding: 6rem 0 4rem; }
+.hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+.hero p { font-size: 1.15rem; color: #9CA3AF; max-width: 700px; margin: 0 auto 2rem; }
+.hero-badges { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+.hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+/* Features grid */
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+.feature-card { background: #1F2937; border: 1px solid #4B5563; border-radius: 12px; padding: 1.5rem; }
+.feature-card h3 { margin-bottom: 0.5rem; }
+.feature-card p { font-size: 0.9rem; color: #9CA3AF; }
+/* Download cards */
+.downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.download-card { background: #1F2937; border: 1px solid #4B5563; border-radius: 12px; padding: 2rem; text-align: center; display: flex; flex-direction: column; }
+.download-card h3 { margin-bottom: 0.5rem; }
+.download-card p { font-size: 0.9rem; color: #9CA3AF; margin-bottom: 1.5rem; flex: 1; }
+.download-card .btn { width: 100%; margin-top: auto; }
+/* Subscription */
+.subscription-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.sub-card { background: #1F2937; border: 1px solid #4B5563; border-radius: 12px; padding: 2rem; text-align: center; }
+.sub-card.featured { border-color: #60A5FA; box-shadow: 0 0 20px rgba(96, 165, 250, 0.1); }
+.sub-card h3 { margin-bottom: 0.5rem; }
+.sub-price { font-size: 2.5rem; font-weight: 700; color: #F9FAFB; margin: 1rem 0; }
+.sub-price span { font-size: 1rem; color: #9CA3AF; font-weight: 400; }
+.sub-card ul { list-style: none; padding: 0; margin-bottom: 1.5rem; }
+.sub-card li { padding: 0.4rem 0; border-bottom: 1px solid #4B5563; font-size: 0.9rem; }
+.sub-card li:last-child { border-bottom: none; }
+.sub-card.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+.badge-dev {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #1F2937;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  vertical-align: middle;
+  margin-left: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+/* Docs layout */
+.docs-layout { display: flex; gap: 2rem; }
+.docs-sidebar { width: 260px; flex-shrink: 0; position: sticky; top: 80px; align-self: flex-start; max-height: calc(100vh - 100px); overflow-y: auto; }
+.docs-sidebar nav { background: #1F2937; border: 1px solid #4B5563; border-radius: 10px; padding: 1rem; }
+.docs-sidebar a { display: block; padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.88rem; color: #D1D5DB; margin-bottom: 0.15rem; }
+.docs-sidebar a:hover, .docs-sidebar a.active { background: rgba(96, 165, 250, 0.1); color: #60A5FA; text-decoration: none; }
+.docs-content { flex: 1; min-width: 0; }
+.docs-section { margin-bottom: 3rem; scroll-margin-top: 80px; }
+/* Mobile sidebar toggle */
+.sidebar-toggle { display: none; background: #1F2937; border: 1px solid #4B5563; color: #D1D5DB; padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; width: 100%; margin-bottom: 1rem; text-align: left; }
+.sidebar-toggle:hover { border-color: #60A5FA; }
+/* Footer */
+.footer { border-top: 1px solid #4B5563; padding: 2rem 0; text-align: center; font-size: 0.85rem; color: #6B7280; }
+.footer a { color: #9CA3AF; }
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 1.75rem; }
+  .hero { padding: 3rem 0 2rem; }
+  .hero h1 { font-size: 2rem; }
+  .navbar-links { gap: 0.75rem; }
+  .docs-layout { flex-direction: column; }
+  .docs-sidebar { width: 100%; position: static; max-height: none; }
+  .docs-sidebar nav { display: none; }
+  .docs-sidebar.open nav { display: block; }
+  .sidebar-toggle { display: block; }
+  .features, .downloads, .subscription-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .navbar-links { gap: 0.5rem; font-size: 0.85rem; }
+  .hero h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="container">
+    <a href="#hero" class="navbar-brand"><img src="tpdroid-icon-without-background.png" alt="">TPDroid</a>
+    <div class="navbar-links">
+      <a href="#hero" data-i18n="nav.home">Inicio</a>
+      <a href="#downloads" data-i18n="nav.downloads">Descargas</a>
+      <a href="#subscription" data-i18n="nav.subscription">Suscripci&oacute;n</a>
+      <a href="#docs" data-i18n="nav.docs">Documentaci&oacute;n</a>
+      <button class="lang-toggle" onclick="toggleLang()">EN</button>
+    </div>
+  </div>
+</nav>
+<main>
+<!-- Hero -->
+<section id="hero" class="hero section">
+  <div class="container">
+    <div class="hero-badges">
+      <span class="badge badge-blue" data-i18n="hero.badge.go">Go/Gin</span>
+      <span class="badge badge-green" data-i18n="hero.badge.android">Android ADB</span>
+      <span class="badge badge-orange" data-i18n="hero.badge.embed">Frontend Embebido</span>
+      <span class="badge badge-red" data-i18n="hero.badge.license">Licencias</span>
+    </div>
+    <h1 data-i18n="hero.title">TPDroid</h1>
+    <p data-i18n="hero.subtitle">Gestor de dispositivos Android v&iacute;a ADB con interfaz web embebida. Procesos, notificaciones, detecci&oacute;n de juegos y bloqueo de anuncios en un solo binario.</p>
+    <div class="hero-actions">
+      <a href="#downloads" class="btn btn-primary" data-i18n="hero.download">Descargar</a>
+      <a href="#docs" class="btn btn-outline" data-i18n="hero.docs">Documentaci&oacute;n</a>
+    </div>
+  </div>
+</section>
+<!-- Features -->
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="text-center" data-i18n="features.title" style="text-align:center">Caracter&iacute;sticas</h2>
+    <div class="features">
+      <div class="feature-card">
+        <h3 data-i18n="features.proc.title">Procesos en tiempo real</h3>
+        <p data-i18n="features.proc.desc">Lista procesos con PID, nombre, UID y estado. Filtro Running-only, b&uacute;squeda y paginaci&oacute;n.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.notif.title">Notificaciones</h3>
+        <p data-i18n="features.notif.desc">Deshabilita o activa notificaciones por app. Bloqueo profundo en juegos con Triple-Lock.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.game.title">Detecci&oacute;n de juegos</h3>
+        <p data-i18n="features.game.desc">Tres estrategias: package name, engines SDKs y permisos. Exclusion list de ~400 apps no-juego.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.ads.title">Ads Scanner</h3>
+        <p data-i18n="features.ads.desc">Detecta notificaciones activas, push web, alarmas de SDKs y overlays. Bloqueo inteligente por canal.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.lic.title">Licencias</h3>
+        <p data-i18n="features.lic.desc">Sistema de 4 capas: instalador, backend, firma HMAC y binding a hardware via Cloudflare + Supabase.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.i18n.title">Biling&uuml;e</h3>
+        <p data-i18n="features.i18n.desc">Interfaz en espa&ntilde;ol e ingl&eacute;s con toggle en vivo. Sin recargar la p&aacute;gina.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.username.title">Username persistente</h3>
+        <p data-i18n="features.username.desc">Nombre de usuario guardado en localStorage. Se solicita al iniciar y se muestra en la barra de navegaci&oacute;n.</p>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="features.notiffilter.title">Filtro por notificaciones</h3>
+        <p data-i18n="features.notiffilter.desc">Filtr&aacute; apps por estado de notificaci&oacute;n: todas, con notificaciones activas o desactivadas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Downloads -->
+<section id="downloads" class="section">
+  <div class="container">
+    <h2 data-i18n="downloads.title">Descargas</h2>
+    <p data-i18n="downloads.subtitle" class="text-muted" style="margin-bottom:2rem">Un solo binario, cero dependencias externas. El frontend est&aacute; embebido en el ejecutable.</p>
+    <div class="downloads">
+      <div class="download-card">
+        <h3 data-i18n="downloads.linux.title">Linux</h3>
+        <p data-i18n="downloads.linux.desc">Binario listo para ejecutar. Incluye instalador automático (solo requiere Linux x64).</p>
+        <a href="#" class="btn btn-outline" data-i18n="downloads.linux.cta">Descargar .tar.gz</a>
+      </div>
+      <div class="download-card">
+        <h3 data-i18n="downloads.windows.title">Windows</h3>
+        <p data-i18n="downloads.windows.desc">Instalador NSIS. Incluye ADB embebido y activator de licencia.</p>
+        <a href="#" class="btn btn-outline" data-i18n="downloads.windows.cta">Descargar .exe</a>
+      </div>
+      <div class="download-card">
+        <h3 data-i18n="downloads.macos.title">macOS</h3>
+        <p data-i18n="downloads.macos.desc">Binario universal para Apple Silicon (M1/M2/M3) e Intel (x64). Incluye script de instalación.</p>
+        <a href="#" class="btn btn-outline" data-i18n="downloads.macos.cta">Descargar .tar.gz</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Subscription (placeholder) -->
+<section id="subscription" class="section section-alt">
+  <div class="container">
+    <h2 data-i18n="sub.title">Planes de Suscripci&oacute;n <span class="badge-dev" data-i18n="sub.coming">EN DESARROLLO</span></h2>
+    <p data-i18n="sub.subtitle" class="text-muted" style="margin-bottom:2rem">Eleg&iacute; el plan que mejor se adapte a tus necesidades. Todos incluyen actualizaciones y soporte.</p>
+    <div class="subscription-grid">
+      <div class="sub-card blurred">
+        <h3 data-i18n="sub.free.title">Free</h3>
+        <div class="sub-price">$0 <span data-i18n="sub.permonth">/mes</span></div>
+        <ul>
+          <li data-i18n="sub.free.f1">Monitoreo de procesos</li>
+          <li data-i18n="sub.free.f2">Gesti&oacute;n de notificaciones</li>
+          <li data-i18n="sub.free.f3">Detecci&oacute;n de juegos</li>
+          <li data-i18n="sub.free.f4">1 dispositivo</li>
+        </ul>
+        <button class="btn btn-outline" disabled style="opacity:0.5" data-i18n="sub.current">Plan actual</button>
+      </div>
+      <div class="sub-card featured blurred">
+        <h3 data-i18n="sub.pro.title">Pro</h3>
+        <div class="sub-price">$9 <span data-i18n="sub.permonth">/mes</span></div>
+        <ul>
+          <li data-i18n="sub.pro.f1">Todo lo de Free</li>
+          <li data-i18n="sub.pro.f2">Ads Scanner completo</li>
+          <li data-i18n="sub.pro.f3">Bloqueo inteligente por canal</li>
+          <li data-i18n="sub.pro.f4">Hasta 3 dispositivos</li>
+          <li data-i18n="sub.pro.f5">Soporte prioritario</li>
+        </ul>
+        <button class="btn btn-primary" data-i18n="sub.cta">Suscribirse</button>
+      </div>
+      <div class="sub-card blurred">
+        <h3 data-i18n="sub.enterprise.title">Enterprise</h3>
+        <div class="sub-price">$29 <span data-i18n="sub.permonth">/mes</span></div>
+        <ul>
+          <li data-i18n="sub.ent.f1">Todo lo de Pro</li>
+          <li data-i18n="sub.ent.f2">Dispositivos ilimitados</li>
+          <li data-i18n="sub.ent.f3">API de licencias dedicada</li>
+          <li data-i18n="sub.ent.f4">SLA garantizado</li>
+          <li data-i18n="sub.ent.f5">Onboarding personalizado</li>
+        </ul>
+        <button class="btn btn-outline" data-i18n="sub.cta2">Contactar</button>
+      </div>
+    </div>
+  </div>
+  <!-- Contact info -->
+  <div class="container" style="text-align: center;">
+    <div class="mt-10 pt-8 pb-8 border-t border-slate-700" style="text-align: center;">
+      <p class="text-gray-400 mb-6" style="text-align: center !important;" data-i18n="sub.contact.intro">¿Interesado en adquirir una licencia? Contactanos por los siguientes medios:</p>
+      <div class="flex justify-center gap-6 flex-wrap" style="justify-content: center;">
+        <a href="https://wa.me/5493482278591" target="_blank" rel="noopener noreferrer" class="text-green-400 hover:text-green-300 flex items-center gap-2 no-underline">
+          <i class="fab fa-whatsapp fa-lg"></i>
+          <span>+54 9 3482 278 591</span>
+        </a>
+        <a href="mailto:support-tpdroid@artisandevs.site" class="text-blue-400 hover:text-blue-300 flex items-center gap-2 no-underline">
+          <i class="far fa-envelope fa-lg"></i>
+          <span>support-tpdroid@artisandevs.site</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Documentation -->
+<section id="docs" class="section">
+  <div class="container">
+    <h2 data-i18n="docs.title">Documentaci&oacute;n T&eacute;cnica</h2>
+    <p data-i18n="docs.subtitle" class="text-muted" style="margin-bottom:2rem">Gu&iacute;a completa del proyecto TPDroid: instalaci&oacute;n, uso y arquitectura.</p>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" data-i18n="docs.menu">☰ Men&uacute; de secciones</button>
+    <div class="docs-layout">
+      <aside class="docs-sidebar">
+        <nav>
+          <a href="#doc-overview" class="active" data-i18n="docs.sidebar.overview">1. Visi&oacute;n general</a>
+          <a href="#doc-install" data-i18n="docs.sidebar.install">2. Instalaci&oacute;n</a>
+          <a href="#doc-adb" data-i18n="docs.sidebar.adb">3. ADB y conexi&oacute;n</a>
+          <a href="#doc-processes" data-i18n="docs.sidebar.processes">4. Dashboard &mdash; Procesos</a>
+          <a href="#doc-apps" data-i18n="docs.sidebar.apps">5. Dashboard &mdash; Apps</a>
+          <a href="#doc-games" data-i18n="docs.sidebar.games">6. Detecci&oacute;n de juegos</a>
+          <a href="#doc-triplelock" data-i18n="docs.sidebar.triplelock">7. Triple-Lock</a>
+          <a href="#doc-ads" data-i18n="docs.sidebar.ads">8. Ads Scanner</a>
+          <a href="#doc-licensing" data-i18n="docs.sidebar.licensing">9. Sistema de licencias</a>
+          <a href="#doc-cicd" data-i18n="docs.sidebar.cicd">10. CI/CD y releases</a>
+        </nav>
+      </aside>
+      <div class="docs-content">
+        <section id="doc-overview" class="docs-section">
+          <h3 data-i18n="doc.overview.title">1. Visi&oacute;n general</h3>
+          <p data-i18n="doc.overview.p1">TPDroid es una aplicaci&oacute;n de escritorio web que se conecta a dispositivos Android v&iacute;a USB (ADB embebido) para gestionar procesos en ejecuci&oacute;n y apps instaladas. Permite forzar detenci&oacute;n de procesos, deshabilitar/activar notificaciones, y aplicar bloqueo profundo en juegos.</p>
+          <p data-i18n="doc.overview.p2">El frontend est&aacute; embebido en el binario Go via <code>go:embed</code>. Un solo binario, cero dependencias externas. Backend con Go/Gin, frontend con Tailwind CSS (CDN) y JS vanilla.</p>
+          <p data-i18n="doc.overview.p3">Incluye un sistema de licencias de 4 capas usando Cloudflare Workers y Supabase, y un panel de administraci&oacute;n FastAPI para gestionar c&oacute;digos de licencia.</p>
+          <h4 data-i18n="doc.overview.arch">Arquitectura del proyecto</h4>
+          <pre><code>backend/           &mdash; Servidor Go/Gin con frontend embebido
+  adb/              &mdash; Wrappers de comandos ADB
+  handlers/         &mdash; Handlers HTTP (status, device, processes, apps, ads)
+  frontend/         &mdash; UI embebida (HTML, CSS, JS)
+  licensing/        &mdash; Paquete de validaci&oacute;n de licencias
+cloudflare/         &mdash; Worker + schema SQL de Supabase
+activator/          &mdash; Binario de activaci&oacute;n de licencias
+api_admin/          &mdash; Panel de administraci&oacute;n (FastAPI)</code></pre>
+        </section>
+        <section id="doc-install" class="docs-section">
+          <h3 data-i18n="doc.install.title">2. Instalaci&oacute;n</h3>
+          <h4 data-i18n="doc.install.prereq">Prerrequisitos</h4>
+          <ul>
+            <li data-i18n="doc.install.pr1">Go 1.21+ (solo para compilaci&oacute;n)</li>
+            <li data-i18n="doc.install.pr2">Dispositivo Android con Depuraci&oacute;n USB habilitada</li>
+            <li data-i18n="doc.install.pr3">Cable USB</li>
+            <li data-i18n="doc.install.pr4">No requiere ADB instalado por separado</li>
+          </ul>
+          <h4 data-i18n="doc.install.devtitle">Modo desarrollo</h4>
+           <pre><code>git clone https://github.com/pabloacisera/TPdroid---adb-manager.git && cd TPdroid---adb-manager
+./script/dev.sh
+# Se abre http://localhost:8080</code></pre>
+          <p data-i18n="doc.install.devp">O manualmente:</p>
+          <pre><code>cd backend && go run main.go</code></pre>
+          <h4 data-i18n="doc.install.build">Build por plataforma</h4>
+          <pre><code>make build-linux     # → dist/android-manager-linux
+make build-windows   # → dist/android-manager-windows.exe
+make build-macos     # → dist/android-manager-macos
+make build-all       # → todos</code></pre>
+          <p data-i18n="doc.install.buildp">El binario incluye el frontend embebido. Se copia a cualquier m&aacute;quina, se ejecuta, se abre <code>http://localhost:8080</code>.</p>
+        </section>
+        <section id="doc-adb" class="docs-section">
+          <h3 data-i18n="doc.adb.title">3. ADB y conexi&oacute;n</h3>
+          <h4 data-i18n="doc.adb.prep">Preparar el tel&eacute;fono</h4>
+          <ol>
+            <li data-i18n="doc.adb.s1"><strong>Ajustes → Acerca del tel&eacute;fono</strong> → tocar <strong>N&uacute;mero de compilaci&oacute;n</strong> 7 veces</li>
+            <li data-i18n="doc.adb.s2"><strong>Ajustes → Opciones de desarrollador</strong> → activar <strong>Depuraci&oacute;n USB</strong></li>
+            <li data-i18n="doc.adb.s3">Mantener el tel&eacute;fono desbloqueado</li>
+          </ol>
+          <h4 data-i18n="doc.adb.connect">Conectar</h4>
+          <ol>
+            <li data-i18n="doc.adb.c1">Conectar el tel&eacute;fono por USB</li>
+            <li data-i18n="doc.adb.c2">La app detecta el dispositivo autom&aacute;ticamente (polling cada 2s, timeout 60s)</li>
+            <li data-i18n="doc.adb.c3">Revisar la pantalla del tel&eacute;fono y pulsar <strong>"Permitir depuraci&oacute;n USB"</strong></li>
+            <li data-i18n="doc.adb.c4">Marcar <strong>"Recordar siempre"</strong> para no repetirlo</li>
+          </ol>
+          <h4 data-i18n="doc.adb.heartbeat">Heartbeat</h4>
+          <p data-i18n="doc.adb.heartbeatp">La app mantiene un heartbeat cada 2s con detecci&oacute;n de desconexi&oacute;n y banner con countdown. Usa Page Visibility API para pausar polling cuando la pesta&ntilde;a no est&aacute; visible.</p>
+        </section>
+        <section id="doc-processes" class="docs-section">
+          <h3 data-i18n="doc.proc.title">4. Dashboard &mdash; Procesos</h3>
+          <p data-i18n="doc.proc.p1">Lista de procesos en ejecuci&oacute;n con PID, nombre, UID y estado (R/S/I/Z/T/D).</p>
+          <ul>
+            <li data-i18n="doc.proc.f1">Usar <strong>"Running only"</strong> para filtrar solo procesos activos</li>
+            <li data-i18n="doc.proc.f2">B&uacute;squeda en tiempo real con debounce</li>
+            <li data-i18n="doc.proc.f3">Paginaci&oacute;n client-side (25 procesos por p&aacute;gina)</li>
+            <li data-i18n="doc.proc.f4">Bot&oacute;n <strong>Force Stop</strong> para detener procesos de usuario</li>
+          </ul>
+          <h4 data-i18n="doc.proc.protect">Protecci&oacute;n de procesos del sistema</h4>
+          <p data-i18n="doc.proc.protectp">Un proceso se considera del sistema si su UID es <code>system</code>, <code>root</code> o <code>shell</code>, o su package empieza con <code>com.android.</code>, <code>android.</code> o es <code>android</code>. Los botones aparecen deshabilitados en la UI y el backend retorna HTTP 403.</p>
+          <p data-i18n="doc.proc.protectp2">Excepci&oacute;n: Chrome (<code>com.android.chrome</code>) y otros browsers instalables son bloqueables aunque usen el prefijo <code>com.android.*</code>. La funci&oacute;n <code>IsSystemProcess()</code> tiene una allowlist expl&iacute;cita que los excluye.</p>
+        </section>
+        <section id="doc-apps" class="docs-section">
+          <h3 data-i18n="doc.apps.title">5. Dashboard &mdash; Apps y Notificaciones</h3>
+          <p data-i18n="doc.apps.p1">Lista de apps de usuario con paquete, etiqueta y permisos.</p>
+          <ul>
+            <li data-i18n="doc.apps.f1">B&uacute;squeda por nombre/paquete en tiempo real</li>
+            <li data-i18n="doc.apps.f2">Bot&oacute;n para <strong>Desactivar/Activar notificaciones</strong></li>
+            <li data-i18n="doc.apps.f3">En juegos: se muestra badge y se aplica Triple-Lock profundo</li>
+            <li data-i18n="doc.apps.f4">Permisos truncados (max 2) con bot&oacute;n <strong>"ver"</strong> para listar todos en modal</li>
+            <li data-i18n="doc.apps.f5">Paginaci&oacute;n client-side (20 apps por p&aacute;gina)</li>
+          </ul>
+        </section>
+        <section id="doc-games" class="docs-section">
+          <h3 data-i18n="doc.games.title">6. Detecci&oacute;n de juegos</h3>
+          <p data-i18n="doc.games.p1">TPDroid detecta juegos autom&aacute;ticamente usando tres estrategias en orden:</p>
+          <h4 data-i18n="doc.games.strat1">1. Package name analysis</h4>
+          <p data-i18n="doc.games.strat1p">Busca segmentos como <code>.game</code>, <code>.games</code>, <code>.gaming</code>, <code>game.</code>, <code>games.</code> y sufijos <code>game</code>/<code>games</code>.</p>
+          <h4 data-i18n="doc.games.strat2">2. Game engines &amp; Ad SDKs</h4>
+          <p data-i18n="doc.games.strat2p">Detecta packages que contengan: <code>unity</code>, <code>unreal</code>, <code>cocos</code>, <code>ironsource</code>, <code>applovin</code>, <code>vungle</code>, <code>admob</code>, <code>chartboost</code>, <code>tapjoy</code>.</p>
+          <h4 data-i18n="doc.games.strat3">3. Permission combo</h4>
+          <p data-i18n="doc.games.strat3p">Si una app tiene <code>VIBRATE</code> + <code>INTERNET</code>, se considera juego (alta probabilidad).</p>
+          <h4 data-i18n="doc.games.exclusion">Exclusion list</h4>
+          <p data-i18n="doc.games.exclusionp">Contiene ~400 prefijos de packages conocidos no-juego (WhatsApp, Facebook, Chrome, Gmail, etc.). Si un package coincide, se descarta como juego inmediatamente.</p>
+          <p data-i18n="doc.games.exclusionp2">Categor&iacute;as cubiertas: Social &amp; Communication, Browsers, Google Apps, Microsoft, Adobe, Streaming, Banking &amp; Finance, Shopping, Food Delivery, Productivity, Health &amp; Fitness, Maps &amp; Travel, Utilities, VPN &amp; Remote, Amazon Apps, Samsung, Xiaomi (MIUI), Huawei, OnePlus, Oppo, Vivo, Realme, y otros OEMs.</p>
+        </section>
+        <section id="doc-triplelock" class="docs-section">
+          <h3 data-i18n="doc.triplelock.title">7. Triple-Lock para juegos (Android 13+)</h3>
+          <p data-i18n="doc.triplelock.p1">Cuando se deshabilitan notificaciones de un juego, se aplican estos 4 comandos:</p>
+          <pre><code>appops set POST_NOTIFICATION deny
+pm revoke POST_NOTIFICATIONS
+pm set-permission-flags user-set
+pm clear-permission-flags user-fixed</code></pre>
+          <h4 data-i18n="doc.triplelock.reenable">Al re-habilitar:</h4>
+          <pre><code>appops set POST_NOTIFICATION allow
+pm grant POST_NOTIFICATIONS
+pm set-permission-flags user-set
+pm clear-permission-flags user-fixed</code></pre>
+          <p data-i18n="doc.triplelock.p2">Los errores de <code>pm</code> se silencian (Android 12- no soporta estos flags). La UI muestra un toast confirmando el bloqueo profundo.</p>
+        </section>
+        <section id="doc-ads" class="docs-section">
+          <h3 data-i18n="doc.ads.title">8. Ads Scanner</h3>
+          <p data-i18n="doc.ads.p1">Detecta actividad publicitaria en tiempo real en el dispositivo. El bloqueo de notificaciones por package no es suficiente porque una app leg&iacute;tima puede contener SDKs de publicidad que generan notificaciones u overlays.</p>
+          <h4 data-i18n="doc.ads.sources">Fuentes de detecci&oacute;n</h4>
+          <table>
+            <thead><tr><th data-i18n="doc.ads.table.signal">Se&ntilde;al</th><th data-i18n="doc.ads.table.cmd">Comando ADB</th><th data-i18n="doc.ads.table.detect">Qu&eacute; detecta</th></tr></thead>
+            <tbody>
+              <tr><td><code>active_notif</code></td><td><code>dumpsys notification --noredact</code></td><td data-i18n="doc.ads.table.r1">Notificaciones activas ahora mismo</td></tr>
+              <tr><td><code>web_push</code></td><td><code>dumpsys notification --noredact</code></td><td data-i18n="doc.ads.table.r2">Notificaciones push de navegador</td></tr>
+              <tr><td><code>ad_alarm</code></td><td><code>dumpsys alarm</code></td><td data-i18n="doc.ads.table.r3">Alarmas repetitivas con tags de SDKs</td></tr>
+              <tr><td><code>overlay_window</code></td><td><code>dumpsys window windows</code></td><td data-i18n="doc.ads.table.r4">Ventanas TYPE_APPLICATION_OVERLAY activas</td></tr>
+            </tbody>
+          </table>
+          <h4 data-i18n="doc.ads.block">Comando de bloqueo</h4>
+          <pre><code>appops set &lt;pkg&gt; SYSTEM_ALERT_WINDOW deny
+appops set &lt;pkg&gt; POST_NOTIFICATION deny
+pm revoke &lt;pkg&gt; android.permission.POST_NOTIFICATIONS
+am force-stop &lt;pkg&gt;</code></pre>
+          <h4 data-i18n="doc.ads.channel">Bloqueo inteligente por canal (SDK-aware)</h4>
+          <p data-i18n="doc.ads.channelp">El sistema detecta la versi&oacute;n del SDK del dispositivo y adapta la estrategia:</p>
+          <table>
+            <thead><tr><th data-i18n="doc.ads.table.sdk">SDK (Android)</th><th data-i18n="doc.ads.table.strat">Estrategia</th></tr></thead>
+            <tbody>
+              <tr><td>≥ 26 (Android 8+)</td><td data-i18n="doc.ads.table.sdk1"><code>cmd notification disable-channel</code> &mdash; bloquea solo el canal intrusivo</td></tr>
+              <tr><td>&lt; 26 (Android 7-)</td><td data-i18n="doc.ads.table.sdk2"><code>appops set POST_NOTIFICATION deny</code> &mdash; bloqueo total</td></tr>
+            </tbody>
+          </table>
+          <h4 data-i18n="doc.ads.limits">Limitaciones conocidas</h4>
+          <ul>
+            <li data-i18n="doc.ads.l1"><code>dumpsys notification --noredact</code> requiere ADB debug</li>
+            <li data-i18n="doc.ads.l2">En Android 12+ algunas notificaciones tienen texto redactado</li>
+            <li data-i18n="doc.ads.l3">Alarmas sin tags expl&iacute;citos pueden no detectarse</li>
+            <li data-i18n="doc.ads.l4">El bloqueo de Chrome bloquea TODAS las notificaciones web, no solo las publicitarias</li>
+            <li data-i18n="doc.ads.l5">Tras force-stop, si el usuario abre la app, el SDK puede re-registrar alarmas</li>
+          </ul>
+          <h4 data-i18n="doc.ads.endpoints">Endpoints</h4>
+          <table>
+            <thead><tr><th>M&eacute;todo</th><th>Ruta</th><th data-i18n="doc.ads.table.desc">Descripci&oacute;n</th></tr></thead>
+            <tbody>
+              <tr><td>GET</td><td><code>/api/ads/scan</code></td><td data-i18n="doc.ads.table.e1">Ejecuta los 3 dumpsys, parsea y devuelve lista unificada</td></tr>
+              <tr><td>POST</td><td><code>/api/ads/block</code></td><td data-i18n="doc.ads.table.e2">Revoca overlay + bloquea notificaciones + force-stop (acepta canales y SDK)</td></tr>
+              <tr><td>POST</td><td><code>/api/ads/unblock</code></td><td data-i18n="doc.ads.table.e3">Restaura overlay + reactiva notificaciones (sim&eacute;trico)</td></tr>
+              <tr><td>POST</td><td><code>/api/ads/block-full</code></td><td data-i18n="doc.ads.table.e4">Bloqueo total expl&iacute;cito, ignora canales y SDK</td></tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="doc-licensing" class="docs-section">
+          <h3 data-i18n="doc.lic.title">9. Sistema de licencias</h3>
+          <p data-i18n="doc.lic.p1">DRM de 4 fases para el binario compilado TPDroid, usando Cloudflare Workers y Supabase.</p>
+          <h4 data-i18n="doc.lic.arch">Arquitectura</h4>
+          <pre><code>┌──────────────┐   POST /activar   ┌──────────────┐   REST   ┌──────────┐
+│  activator   │ ────────────────→ │   Worker     │ ────────→│ Supabase │
+│  (Win/Linux) │ ←──────────────── │  cloudflare/  │ ←─────── │          │
+└──────────────┘   .lic (firmado)   └──────┬───────┘          └──────────┘
+┌──────────────┐   POST /revalidar        │
+│   backend    │ ──────────────────────────→
+│  (Go/Gin)    │ ←──────────────────────────
+└──────┬───────┘   ok / error
+       │ 403 si no hay licencia
+       ▼
+┌──────────────┐
+│ license-     │
+│ error.html   │
+└──────────────┘</code></pre>
+          <h4 data-i18n="doc.lic.flow">Flujo de activaci&oacute;n</h4>
+          <ol>
+            <li data-i18n="doc.lic.f1">El desarrollador genera un c&oacute;digo en el Panel Admin → se guarda en Supabase</li>
+            <li data-i18n="doc.lic.f2">El cliente ejecuta <code>TPDroid-Setup.exe</code> (o <code>install.sh</code> en Linux)</li>
+            <li data-i18n="doc.lic.f3">El instalador ejecuta <code>activator</code> que abre un formulario en el navegador</li>
+            <li data-i18n="doc.lic.f4">El usuario ingresa el c&oacute;digo de licencia</li>
+            <li data-i18n="doc.lic.f5"><code>activator</code> obtiene el fingerprint del hardware (SHA-256)</li>
+            <li data-i18n="doc.lic.f6">Env&iacute;a <code>{codigo, hw_id, email}</code> al Worker (<code>POST /activar</code>)</li>
+            <li data-i18n="doc.lic.f7">El Worker valida en Supabase: c&oacute;digo existe y no est&aacute; usado</li>
+            <li data-i18n="doc.lic.f8">Si ok: marca como usado, genera archivo <code>.lic</code> firmado con HMAC</li>
+            <li data-i18n="doc.lic.f9"><code>activator</code> guarda <code>.lic</code> en el sistema y retorna exit code 0</li>
+            <li data-i18n="doc.lic.f10">Si error: muestra mensaje, retorna exit code ≠ 0</li>
+            <li data-i18n="doc.lic.f11">El instalador verifica el exit code</li>
+          </ol>
+          <h4 data-i18n="doc.lic.reval">Flujo de revalidaci&oacute;n</h4>
+          <ol>
+            <li data-i18n="doc.lic.r1">El backend inicia y lee el archivo <code>.lic</code></li>
+            <li data-i18n="doc.lic.r2">Env&iacute;a <code>.lic</code> + <code>current_hw_id</code> al Worker (<code>POST /revalidar</code>)</li>
+            <li data-i18n="doc.lic.r3">El Worker valida: HMAC, hw_id actual vs registrado, estado en Supabase</li>
+            <li data-i18n="doc.lic.r4">Si ok: el backend funciona normalmente</li>
+            <li data-i18n="doc.lic.r5">Si falla: todas las rutas <code>/api/*</code> devuelven 403, se sirve <code>license-error.html</code></li>
+          </ol>
+          <h4 data-i18n="doc.lic.security">Capas de seguridad</h4>
+          <ol>
+            <li data-i18n="doc.lic.s1"><strong>Primera capa</strong> (instalador): <code>activator</code> evita la instalaci&oacute;n si el c&oacute;digo es inv&aacute;lido</li>
+            <li data-i18n="doc.lic.s2"><strong>Segunda capa</strong> (backend): revalidaci&oacute;n contra el Worker cada vez que arranca la app</li>
+            <li data-i18n="doc.lic.s3"><strong>Firma HMAC</strong>: el <code>.lic</code> est&aacute; firmado, no se puede falsificar sin el secreto del Worker</li>
+            <li data-i18n="doc.lic.s4"><strong>Binding a hardware</strong>: el <code>.lic</code> est&aacute; vinculado al <code>hw_id</code>, no funciona en otro equipo</li>
+          </ol>
+          <h4 data-i18n="doc.lic.worker">Endpoints del Worker</h4>
+          <table>
+            <thead><tr><th>M&eacute;todo</th><th>Ruta</th><th data-i18n="doc.lic.table.desc">Descripci&oacute;n</th></tr></thead>
+            <tbody>
+              <tr><td>POST</td><td><code>/activar</code></td><td data-i18n="doc.lic.table.e1">Activa un c&oacute;digo con hw_id y email opcional, genera .lic firmado</td></tr>
+              <tr><td>POST</td><td><code>/revalidar</code></td><td data-i18n="doc.lic.table.e2">Revalida un .lic existente contra Supabase</td></tr>
+              <tr><td>POST</td><td><code>/revocar</code></td><td data-i18n="doc.lic.table.e3">Revoca una licencia (requiere X-Admin-Secret)</td></tr>
+            </tbody>
+          </table>
+          <h4 data-i18n="doc.lic.env">Variables de entorno</h4>
+          <table>
+            <thead><tr><th data-i18n="doc.lic.table.component">Componente</th><th>Variable</th><th data-i18n="doc.lic.table.desc">Descripci&oacute;n</th></tr></thead>
+            <tbody>
+              <tr><td>Worker</td><td><code>SUPABASE_URL</code></td><td data-i18n="doc.lic.table.var1">URL del proyecto Supabase</td></tr>
+              <tr><td>Worker</td><td><code>SUPABASE_SERVICE_KEY</code></td><td data-i18n="doc.lic.table.var2">Service role key</td></tr>
+              <tr><td>Worker</td><td><code>LICENSE_SECRET</code></td><td data-i18n="doc.lic.table.var3">Secreto HMAC para firmar .lic</td></tr>
+              <tr><td>Backend</td><td><code>LICENSE_WORKER_URL</code></td><td data-i18n="doc.lic.table.var4">URL del Worker</td></tr>
+              <tr><td>Activator</td><td><code>ACTIVATOR_PORT</code></td><td data-i18n="doc.lic.table.var5b">Puerto HTTP embebido (0 = aleatorio)</td></tr>
+              <tr><td>Panel Admin</td><td><code>SUPABASE_URL</code></td><td data-i18n="doc.lic.table.var6">URL del proyecto Supabase</td></tr>
+              <tr><td>Panel Admin</td><td><code>SUPABASE_SERVICE_KEY</code></td><td data-i18n="doc.lic.table.var7">Service role key</td></tr>
+              <tr><td>Panel Admin</td><td><code>ADMIN_API_KEY</code></td><td data-i18n="doc.lic.table.var8">Clave de autenticaci&oacute;n del admin</td></tr>
+            </tbody>
+          </table>
+          <h4 data-i18n="doc.lic.states">Estados de licencia</h4>
+          <table>
+            <thead><tr><th data-i18n="doc.lic.table.state">Estado</th><th><code>usado</code></th><th><code>revocado</code></th><th data-i18n="doc.lic.table.desc">Descripci&oacute;n</th></tr></thead>
+            <tbody>
+              <tr><td>Disponible</td><td><code>false</code></td><td><code>false</code></td><td data-i18n="doc.lic.table.st1">Puede activarse</td></tr>
+              <tr><td>Activa</td><td><code>true</code></td><td><code>false</code></td><td data-i18n="doc.lic.table.st2">En uso por un equipo</td></tr>
+              <tr><td>Revocada</td><td><code>*</code></td><td><code>true</code></td><td data-i18n="doc.lic.table.st3">Desactivada por el admin, no puede activarse ni revalidarse</td></tr>
+            </tbody>
+          </table>
+          <h4 data-i18n="doc.lic.schema">Schema SQL (Supabase)</h4>
+          <pre><code>CREATE TABLE IF NOT EXISTS licencias (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  codigo VARCHAR(32) UNIQUE NOT NULL,
+  usado BOOLEAN NOT NULL DEFAULT false,
+  hw_id TEXT,
+  email TEXT,
+  fecha_activacion TIMESTAMPTZ,
+  revocado BOOLEAN NOT NULL DEFAULT false,
+  creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
+);</code></pre>
+        </section>
+        <section id="doc-cicd" class="docs-section">
+          <h3 data-i18n="doc.cicd.title">10. CI/CD y releases</h3>
+          <p data-i18n="doc.cicd.p1">Las releases se generan <strong>solo cuando el desarrollador decide versionar</strong>, no en cada push.</p>
+          <h4 data-i18n="doc.cicd.trigger">Disparar una release</h4>
+          <pre><code>git tag v1.0.0          # Eleg&iacute; la versi&oacute;n
+git push origin v1.0.0  # → GitHub Actions se activa</code></pre>
+          <p data-i18n="doc.cicd.p2">Esto ejecuta el workflow <code>release.yml</code> que:</p>
+          <ol>
+            <li data-i18n="doc.cicd.s1">Compila el backend Go + activator para Linux, Windows y macOS</li>
+            <li data-i18n="doc.cicd.s2">Empaqueta <code>dist/tpdroid-linux.tar.gz</code> (tarball Linux con install.sh)</li>
+            <li data-i18n="doc.cicd.s3">Genera <code>dist/TPDroid-Setup.exe</code> (instalador Windows via NSIS)</li>
+            <li data-i18n="doc.cicd.s4">Crea un <strong>draft release</strong> en GitHub con ambos archivos</li>
+          </ol>
+          <p data-i18n="doc.cicd.p3">La <code>LICENSE_WORKER_URL</code> se toma de <code>api_admin/.env</code> autom&aacute;ticamente.</p>
+          <h4 data-i18n="doc.cicd.publish">Publicar la release</h4>
+          <ol>
+            <li data-i18n="doc.cicd.p1">Ir a <strong>GitHub → Releases → Drafts</strong></li>
+            <li data-i18n="doc.cicd.p2">Revisar los artifacts, editar descripci&oacute;n si hace falta</li>
+            <li data-i18n="doc.cicd.p3">Hacer clic en <strong>"Publish release"</strong></li>
+          </ol>
+          <h4 data-i18n="doc.cicd.manual">Lanzar manualmente</h4>
+          <p data-i18n="doc.cicd.manualp">Desde <strong>GitHub → Actions → Build and Release → Run workflow</strong> (&uacute;til para pruebas).</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="footer">
+  <div class="container">
+    <div class="flex justify-center gap-6 flex-wrap mb-3">
+      <a href="https://wa.me/5493482278591" target="_blank" rel="noopener noreferrer" class="text-green-400 hover:text-green-300 flex items-center gap-2 no-underline">
+        <i class="fab fa-whatsapp fa-lg"></i>
+        <span>+54 9 3482 278 591</span>
+      </a>
+      <a href="mailto:support-tpdroid@artisandevs.site" class="text-blue-400 hover:text-blue-300 flex items-center gap-2 no-underline">
+        <i class="far fa-envelope fa-lg"></i>
+        <span>support-tpdroid@artisandevs.site</span>
+      </a>
+      <a href="https://github.com/pabloacisera/TPdroid---adb-manager.git" target="_blank" rel="noopener" class="text-gray-400 hover:text-gray-300 flex items-center gap-2 no-underline">
+        <i class="fab fa-github fa-lg"></i>
+        <span>GitHub</span>
+      </a>
+    </div>
+    <p data-i18n="footer.copyright">&copy; 2026 TPDroid. Todos los derechos reservados.</p>
+  </div>
+</footer>
+<script>
+const i18n = {
+  es: {
+    title: "TPDroid — Android Process & Notification Manager",
+    "nav.home": "Inicio",
+    "nav.downloads": "Descargas",
+    "nav.subscription": "Suscripci\u00f3n",
+    "nav.docs": "Documentaci\u00f3n",
+    "hero.badge.go": "Go/Gin",
+    "hero.badge.android": "Android ADB",
+    "hero.badge.embed": "Frontend Embebido",
+    "hero.badge.license": "Licencias",
+    "hero.title": "TPDroid",
+    "hero.subtitle": "Gestor de dispositivos Android v\u00eda ADB con interfaz web embebida. Procesos, notificaciones, detecci\u00f3n de juegos y bloqueo de anuncios en un solo binario.",
+    "hero.download": "Descargar",
+    "hero.docs": "Documentaci\u00f3n",
+    "features.title": "Caracter\u00edsticas",
+    "features.proc.title": "Procesos en tiempo real",
+    "features.proc.desc": "Lista procesos con PID, nombre, UID y estado. Filtro Running-only, b\u00fasqueda y paginaci\u00f3n.",
+    "features.notif.title": "Notificaciones",
+    "features.notif.desc": "Deshabilita o activa notificaciones por app. Bloqueo profundo en juegos con Triple-Lock.",
+    "features.game.title": "Detecci\u00f3n de juegos",
+    "features.game.desc": "Tres estrategias: package name, engines SDKs y permisos. Exclusion list de ~400 apps no-juego.",
+    "features.ads.title": "Ads Scanner",
+    "features.ads.desc": "Detecta notificaciones activas, push web, alarmas de SDKs y overlays. Bloqueo inteligente por canal.",
+    "features.lic.title": "Licencias",
+    "features.lic.desc": "Sistema de 4 capas: instalador, backend, firma HMAC y binding a hardware via Cloudflare + Supabase.",
+    "features.i18n.title": "Biling\u00fce",
+    "features.i18n.desc": "Interfaz en espa\u00f1ol e ingl\u00e9s con toggle en vivo. Sin recargar la p\u00e1gina.",
+    "features.username.title": "Username persistente",
+    "features.username.desc": "Nombre de usuario guardado en localStorage. Se solicita al iniciar y se muestra en la barra de navegaci\u00f3n.",
+    "features.notiffilter.title": "Filtro por notificaciones",
+    "features.notiffilter.desc": "Filtr\u00e1 apps por estado de notificaci\u00f3n: todas, con notificaciones activas o desactivadas.",
+    "downloads.title": "Descargas",
+    "downloads.subtitle": "Un solo binario, cero dependencias externas. El frontend est\u00e1 embebido en el ejecutable.",
+    "downloads.linux.title": "Linux",
+    "downloads.linux.desc": "Tarball con binario + install.sh. Compatible con cualquier distro (Go 1.21+).",
+    "downloads.linux.cta": "Descargar .tar.gz",
+    "downloads.windows.title": "Windows",
+    "downloads.windows.desc": "Instalador NSIS. Incluye ADB embebido y activator de licencia.",
+    "downloads.windows.cta": "Descargar .exe",
+    "downloads.macos.title": "macOS",
+    "downloads.macos.desc": "Binario para macOS. Pr\u00f3ximamente disponible.",
+    "downloads.macos.cta": "Descargar .tar.gz",
+    "sub.title": "Planes de Suscripci\u00f3n",
+    "sub.subtitle": "Eleg\u00ed el plan que mejor se adapte a tus necesidades. Todos incluyen actualizaciones y soporte.",
+    "sub.permonth": "/mes",
+    "sub.free.title": "Free",
+    "sub.free.f1": "Monitoreo de procesos",
+    "sub.free.f2": "Gesti\u00f3n de notificaciones",
+    "sub.free.f3": "Detecci\u00f3n de juegos",
+    "sub.free.f4": "1 dispositivo",
+    "sub.current": "Plan actual",
+    "sub.pro.title": "Pro",
+    "sub.pro.f1": "Todo lo de Free",
+    "sub.pro.f2": "Ads Scanner completo",
+    "sub.pro.f3": "Bloqueo inteligente por canal",
+    "sub.pro.f4": "Hasta 3 dispositivos",
+    "sub.pro.f5": "Soporte prioritario",
+    "sub.cta": "Suscribirse",
+    "sub.enterprise.title": "Enterprise",
+    "sub.ent.f1": "Todo lo de Pro",
+    "sub.ent.f2": "Dispositivos ilimitados",
+    "sub.ent.f3": "API de licencias dedicada",
+    "sub.ent.f4": "SLA garantizado",
+    "sub.ent.f5": "Onboarding personalizado",
+    "sub.cta2": "Contactar",
+    "sub.contact.intro": "¿Interesado en adquirir una licencia? Contáctanos por los siguientes medios:",
+    "sub.coming": "EN DESARROLLO",
+    "docs.title": "Documentaci\u00f3n T\u00e9cnica",
+    "docs.subtitle": "Gu\u00eda completa del proyecto TPDroid: instalaci\u00f3n, uso y arquitectura.",
+    "docs.menu": "\u2630 Men\u00fa de secciones",
+    "docs.sidebar.overview": "1. Visi\u00f3n general",
+    "docs.sidebar.install": "2. Instalaci\u00f3n",
+    "docs.sidebar.adb": "3. ADB y conexi\u00f3n",
+    "docs.sidebar.processes": "4. Dashboard \u2014 Procesos",
+    "docs.sidebar.apps": "5. Dashboard \u2014 Apps",
+    "docs.sidebar.games": "6. Detecci\u00f3n de juegos",
+    "docs.sidebar.triplelock": "7. Triple-Lock",
+    "docs.sidebar.ads": "8. Ads Scanner",
+    "docs.sidebar.licensing": "9. Sistema de licencias",
+    "docs.sidebar.cicd": "10. CI/CD y releases",
+    "doc.overview.title": "1. Visi\u00f3n general",
+    "doc.overview.p1": "TPDroid es una aplicaci\u00f3n de escritorio web que se conecta a dispositivos Android v\u00eda USB (ADB embebido) para gestionar procesos en ejecuci\u00f3n y apps instaladas. Permite forzar detenci\u00f3n de procesos, deshabilitar/activar notificaciones, y aplicar bloqueo profundo en juegos.",
+    "doc.overview.p2": "El frontend est\u00e1 embebido en el binario Go via <code>go:embed</code>. Un solo binario, cero dependencias externas. Backend con Go/Gin, frontend con Tailwind CSS (CDN) y JS vanilla.",
+    "doc.overview.p3": "Incluye un sistema de licencias de 4 capas usando Cloudflare Workers y Supabase, y un panel de administraci\u00f3n FastAPI para gestionar c\u00f3digos de licencia.",
+    "doc.overview.arch": "Arquitectura del proyecto",
+    "doc.install.title": "2. Instalaci\u00f3n",
+    "doc.install.prereq": "Prerrequisitos",
+    "doc.install.pr1": "Go 1.21+ (solo para compilaci\u00f3n)",
+    "doc.install.pr2": "Dispositivo Android con Depuraci\u00f3n USB habilitada",
+    "doc.install.pr3": "Cable USB",
+    "doc.install.pr4": "No requiere ADB instalado por separado",
+    "doc.install.devtitle": "Modo desarrollo",
+    "doc.install.devp": "O manualmente:",
+    "doc.install.build": "Build por plataforma",
+    "doc.install.buildp": "El binario incluye el frontend embebido. Se copia a cualquier m\u00e1quina, se ejecuta, se abre <code>http://localhost:8080</code>.",
+    "doc.adb.title": "3. ADB y conexi\u00f3n",
+    "doc.adb.prep": "Preparar el tel\u00e9fono",
+    "doc.adb.s1": "<strong>Ajustes \u2192 Acerca del tel\u00e9fono</strong> \u2192 tocar <strong>N\u00famero de compilaci\u00f3n</strong> 7 veces",
+    "doc.adb.s2": "<strong>Ajustes \u2192 Opciones de desarrollador</strong> \u2192 activar <strong>Depuraci\u00f3n USB</strong>",
+    "doc.adb.s3": "Mantener el tel\u00e9fono desbloqueado",
+    "doc.adb.connect": "Conectar",
+    "doc.adb.c1": "Conectar el tel\u00e9fono por USB",
+    "doc.adb.c2": "La app detecta el dispositivo autom\u00e1ticamente (polling cada 2s, timeout 60s)",
+    "doc.adb.c3": "Revisar la pantalla del tel\u00e9fono y pulsar <strong>\"Permitir depuraci\u00f3n USB\"</strong>",
+    "doc.adb.c4": "Marcar <strong>\"Recordar siempre\"</strong> para no repetirlo",
+    "doc.adb.heartbeat": "Heartbeat",
+    "doc.adb.heartbeatp": "La app mantiene un heartbeat cada 2s con detecci\u00f3n de desconexi\u00f3n y banner con countdown. Usa Page Visibility API para pausar polling cuando la pesta\u00f1a no est\u00e1 visible.",
+    "doc.proc.title": "4. Dashboard \u2014 Procesos",
+    "doc.proc.p1": "Lista de procesos en ejecuci\u00f3n con PID, nombre, UID y estado (R/S/I/Z/T/D).",
+    "doc.proc.f1": "Usar <strong>\"Running only\"</strong> para filtrar solo procesos activos",
+    "doc.proc.f2": "B\u00fasqueda en tiempo real con debounce",
+    "doc.proc.f3": "Paginaci\u00f3n client-side (25 procesos por p\u00e1gina)",
+    "doc.proc.f4": "Bot\u00f3n <strong>Force Stop</strong> para detener procesos de usuario",
+    "doc.proc.protect": "Protecci\u00f3n de procesos del sistema",
+    "doc.proc.protectp": "Un proceso se considera del sistema si su UID es <code>system</code>, <code>root</code> o <code>shell</code>, o su package empieza con <code>com.android.</code>, <code>android.</code> o es <code>android</code>. Los botones aparecen deshabilitados en la UI y el backend retorna HTTP 403.",
+    "doc.proc.protectp2": "Excepci\u00f3n: Chrome (<code>com.android.chrome</code>) y otros browsers instalables son bloqueables aunque usen el prefijo <code>com.android.*</code>. La funci\u00f3n <code>IsSystemProcess()</code> tiene una allowlist expl\u00edcita que los excluye.",
+    "doc.apps.title": "5. Dashboard \u2014 Apps y Notificaciones",
+    "doc.apps.p1": "Lista de apps de usuario con paquete, etiqueta y permisos.",
+    "doc.apps.f1": "B\u00fasqueda por nombre/paquete en tiempo real",
+    "doc.apps.f2": "Bot\u00f3n para <strong>Desactivar/Activar notificaciones</strong>",
+    "doc.apps.f3": "En juegos: se muestra badge y se aplica Triple-Lock profundo",
+    "doc.apps.f4": "Permisos truncados (max 2) con bot\u00f3n <strong>\"ver\"</strong> para listar todos en modal",
+    "doc.apps.f5": "Paginaci\u00f3n client-side (20 apps por p\u00e1gina)",
+    "doc.games.title": "6. Detecci\u00f3n de juegos",
+    "doc.games.p1": "TPDroid detecta juegos autom\u00e1ticamente usando tres estrategias en orden:",
+    "doc.games.strat1": "1. Package name analysis",
+    "doc.games.strat1p": "Busca segmentos como <code>.game</code>, <code>.games</code>, <code>.gaming</code>, <code>game.</code>, <code>games.</code> y sufijos <code>game</code>/<code>games</code>.",
+    "doc.games.strat2": "2. Game engines & Ad SDKs",
+    "doc.games.strat2p": "Detecta packages que contengan: <code>unity</code>, <code>unreal</code>, <code>cocos</code>, <code>ironsource</code>, <code>applovin</code>, <code>vungle</code>, <code>admob</code>, <code>chartboost</code>, <code>tapjoy</code>.",
+    "doc.games.strat3": "3. Permission combo",
+    "doc.games.strat3p": "Si una app tiene <code>VIBRATE</code> + <code>INTERNET</code>, se considera juego (alta probabilidad).",
+    "doc.games.exclusion": "Exclusion list",
+    "doc.games.exclusionp": "Contiene ~400 prefijos de packages conocidos no-juego (WhatsApp, Facebook, Chrome, Gmail, etc.). Si un package coincide, se descarta como juego inmediatamente.",
+    "doc.games.exclusionp2": "Categor\u00edas cubiertas: Social & Communication, Browsers, Google Apps, Microsoft, Adobe, Streaming, Banking & Finance, Shopping, Food Delivery, Productivity, Health & Fitness, Maps & Travel, Utilities, VPN & Remote, Amazon Apps, Samsung, Xiaomi (MIUI), Huawei, OnePlus, Oppo, Vivo, Realme, y otros OEMs.",
+    "doc.triplelock.title": "7. Triple-Lock para juegos (Android 13+)",
+    "doc.triplelock.p1": "Cuando se deshabilitan notificaciones de un juego, se aplican estos 4 comandos:",
+    "doc.triplelock.reenable": "Al re-habilitar:",
+    "doc.triplelock.p2": "Los errores de <code>pm</code> se silencian (Android 12- no soporta estos flags). La UI muestra un toast confirmando el bloqueo profundo.",
+    "doc.ads.title": "8. Ads Scanner",
+    "doc.ads.p1": "Detecta actividad publicitaria en tiempo real en el dispositivo. El bloqueo de notificaciones por package no es suficiente porque una app leg\u00edtima puede contener SDKs de publicidad que generan notificaciones u overlays.",
+    "doc.ads.sources": "Fuentes de detecci\u00f3n",
+    "doc.ads.table.signal": "Se\u00f1al",
+    "doc.ads.table.cmd": "Comando ADB",
+    "doc.ads.table.detect": "Qu\u00e9 detecta",
+    "doc.ads.table.r1": "Notificaciones activas ahora mismo",
+    "doc.ads.table.r2": "Notificaciones push de navegador",
+    "doc.ads.table.r3": "Alarmas repetitivas con tags de SDKs",
+    "doc.ads.table.r4": "Ventanas TYPE_APPLICATION_OVERLAY activas",
+    "doc.ads.block": "Comando de bloqueo",
+    "doc.ads.channel": "Bloqueo inteligente por canal (SDK-aware)",
+    "doc.ads.channelp": "El sistema detecta la versi\u00f3n del SDK del dispositivo y adapta la estrategia:",
+    "doc.ads.table.sdk": "SDK (Android)",
+    "doc.ads.table.strat": "Estrategia",
+    "doc.ads.table.sdk1": "<code>cmd notification disable-channel</code> \u2014 bloquea solo el canal intrusivo",
+    "doc.ads.table.sdk2": "<code>appops set POST_NOTIFICATION deny</code> \u2014 bloqueo total",
+    "doc.ads.limits": "Limitaciones conocidas",
+    "doc.ads.l1": "<code>dumpsys notification --noredact</code> requiere ADB debug",
+    "doc.ads.l2": "En Android 12+ algunas notificaciones tienen texto redactado",
+    "doc.ads.l3": "Alarmas sin tags expl\u00edcitos pueden no detectarse",
+    "doc.ads.l4": "El bloqueo de Chrome bloquea TODAS las notificaciones web, no solo las publicitarias",
+    "doc.ads.l5": "Tras force-stop, si el usuario abre la app, el SDK puede re-registrar alarmas",
+    "doc.ads.endpoints": "Endpoints",
+    "doc.ads.table.desc": "Descripci\u00f3n",
+    "doc.ads.table.e1": "Ejecuta los 3 dumpsys, parsea y devuelve lista unificada",
+    "doc.ads.table.e2": "Revoca overlay + bloquea notificaciones + force-stop (acepta canales y SDK)",
+    "doc.ads.table.e3": "Restaura overlay + reactiva notificaciones (sim\u00e9trico)",
+    "doc.ads.table.e4": "Bloqueo total expl\u00edcito, ignora canales y SDK",
+    "doc.lic.title": "9. Sistema de licencias",
+    "doc.lic.p1": "DRM de 4 fases para el binario compilado TPDroid, usando Cloudflare Workers y Supabase.",
+    "doc.lic.arch": "Arquitectura",
+    "doc.lic.flow": "Flujo de activaci\u00f3n",
+    "doc.lic.f1": "El desarrollador genera un c\u00f3digo en el Panel Admin \u2192 se guarda en Supabase",
+    "doc.lic.f2": "El cliente ejecuta <code>TPDroid-Setup.exe</code> (o <code>install.sh</code> en Linux)",
+    "doc.lic.f3": "El instalador ejecuta <code>activator</code> que abre un formulario en el navegador",
+    "doc.lic.f4": "El usuario ingresa el c\u00f3digo de licencia",
+    "doc.lic.f5": "<code>activator</code> obtiene el fingerprint del hardware (SHA-256)",
+    "doc.lic.f6": "Env\u00eda <code>{codigo, hw_id, email}</code> al Worker (<code>POST /activar</code>)",
+    "doc.lic.f7": "El Worker valida en Supabase: c\u00f3digo existe y no est\u00e1 usado",
+    "doc.lic.f8": "Si ok: marca como usado, genera archivo <code>.lic</code> firmado con HMAC",
+    "doc.lic.f9": "<code>activator</code> guarda <code>.lic</code> en el sistema y retorna exit code 0",
+    "doc.lic.f10": "Si error: muestra mensaje, retorna exit code \u2260 0",
+    "doc.lic.f11": "El instalador verifica el exit code",
+    "doc.lic.reval": "Flujo de revalidaci\u00f3n",
+    "doc.lic.r1": "El backend inicia y lee el archivo <code>.lic</code>",
+    "doc.lic.r2": "Env\u00eda <code>.lic</code> + <code>current_hw_id</code> al Worker (<code>POST /revalidar</code>)",
+    "doc.lic.r3": "El Worker valida: HMAC, hw_id actual vs registrado, estado en Supabase",
+    "doc.lic.r4": "Si ok: el backend funciona normalmente",
+    "doc.lic.r5": "Si falla: todas las rutas <code>/api/*</code> devuelven 403, se sirve <code>license-error.html</code>",
+    "doc.lic.security": "Capas de seguridad",
+    "doc.lic.s1": "<strong>Primera capa</strong> (instalador): <code>activator</code> evita la instalaci\u00f3n si el c\u00f3digo es inv\u00e1lido",
+    "doc.lic.s2": "<strong>Segunda capa</strong> (backend): revalidaci\u00f3n contra el Worker cada vez que arranca la app",
+    "doc.lic.s3": "<strong>Firma HMAC</strong>: el <code>.lic</code> est\u00e1 firmado, no se puede falsificar sin el secreto del Worker",
+    "doc.lic.s4": "<strong>Binding a hardware</strong>: el <code>.lic</code> est\u00e1 vinculado al <code>hw_id</code>, no funciona en otro equipo",
+    "doc.lic.worker": "Endpoints del Worker",
+    "doc.lic.table.desc": "Descripci\u00f3n",
+    "doc.lic.table.component": "Componente",
+    "doc.lic.table.e1": "Activa un c\u00f3digo con hw_id y email opcional, genera .lic firmado",
+    "doc.lic.table.e2": "Revalida un .lic existente contra Supabase",
+    "doc.lic.table.e3": "Revoca una licencia (requiere X-Admin-Secret)",
+    "doc.lic.env": "Variables de entorno",
+    "doc.lic.table.var1": "URL del proyecto Supabase",
+    "doc.lic.table.var2": "Service role key",
+    "doc.lic.table.var3": "Secreto HMAC para firmar .lic",
+    "doc.lic.table.var4": "URL del Worker",
+    "doc.lic.table.var5": "URL del proyecto Supabase",
+    "doc.lic.table.var5b": "Puerto HTTP embebido (0 = aleatorio)",
+    "doc.lic.table.var6": "URL del proyecto Supabase",
+    "doc.lic.table.var7": "Service role key",
+    "doc.lic.table.var8": "Clave de autenticaci\u00f3n del admin",
+    "doc.lic.states": "Estados de licencia",
+    "doc.lic.table.state": "Estado",
+    "doc.lic.table.st1": "Puede activarse",
+    "doc.lic.table.st2": "En uso por un equipo",
+    "doc.lic.table.st3": "Desactivada por el admin, no puede activarse ni revalidarse",
+    "doc.lic.schema": "Schema SQL (Supabase)",
+    "doc.cicd.title": "10. CI/CD y releases",
+    "doc.cicd.p1": "Las releases se generan <strong>solo cuando el desarrollador decide versionar</strong>, no en cada push.",
+    "doc.cicd.trigger": "Disparar una release",
+    "doc.cicd.p2": "Esto ejecuta el workflow <code>release.yml</code> que:",
+    "doc.cicd.s1": "Compila el backend Go + activator para Linux, Windows y macOS",
+    "doc.cicd.s2": "Empaqueta <code>dist/tpdroid-linux.tar.gz</code> (tarball Linux con install.sh)",
+    "doc.cicd.s3": "Genera <code>dist/TPDroid-Setup.exe</code> (instalador Windows via NSIS)",
+    "doc.cicd.s4": "Crea un <strong>draft release</strong> en GitHub con ambos archivos",
+    "doc.cicd.p3": "La <code>LICENSE_WORKER_URL</code> se toma de <code>api_admin/.env</code> autom\u00e1ticamente.",
+    "doc.cicd.publish": "Publicar la release",
+    "doc.cicd.p1i": "Ir a <strong>GitHub \u2192 Releases \u2192 Drafts</strong>",
+    "doc.cicd.p2i": "Revisar los artifacts, editar descripci\u00f3n si hace falta",
+    "doc.cicd.p3i": "Hacer clic en <strong>\"Publish release\"</strong>",
+    "doc.cicd.manual": "Lanzar manualmente",
+    "doc.cicd.manualp": "Desde <strong>GitHub \u2192 Actions \u2192 Build and Release \u2192 Run workflow</strong> (\u00fatil para pruebas).",
+    "footer.copyright": "\u00a9 2026 TPDroid. Todos los derechos reservados."
+  },
+  en: {
+    title: "TPDroid — Android Process & Notification Manager",
+    "nav.home": "Home",
+    "nav.downloads": "Downloads",
+    "nav.subscription": "Subscription",
+    "nav.docs": "Documentation",
+    "hero.badge.go": "Go/Gin",
+    "hero.badge.android": "Android ADB",
+    "hero.badge.embed": "Embedded Frontend",
+    "hero.badge.license": "Licensing",
+    "hero.title": "TPDroid",
+    "hero.subtitle": "Android device manager via ADB with embedded web interface. Processes, notifications, game detection, and ad blocking in a single binary.",
+    "hero.download": "Download",
+    "hero.docs": "Documentation",
+    "features.title": "Features",
+    "features.proc.title": "Real-time Processes",
+    "features.proc.desc": "List processes with PID, name, UID and state. Running-only filter, search and pagination.",
+    "features.notif.title": "Notifications",
+    "features.notif.desc": "Disable or enable notifications per app. Deep blocking on games with Triple-Lock.",
+    "features.game.title": "Game Detection",
+    "features.game.desc": "Three strategies: package name, engine SDKs and permissions. Exclusion list of ~400 non-game apps.",
+    "features.ads.title": "Ads Scanner",
+    "features.ads.desc": "Detects active notifications, web push, SDK alarms and overlays. Smart channel-based blocking.",
+    "features.lic.title": "Licensing",
+    "features.lic.desc": "4-layer system: installer, backend, HMAC signing and hardware binding via Cloudflare + Supabase.",
+    "features.i18n.title": "Bilingual",
+    "features.i18n.desc": "Spanish and English interface with live toggle. No page reload needed.",
+    "features.username.title": "Persistent Username",
+    "features.username.desc": "Username saved in localStorage. Prompted on first run and displayed in the navigation bar.",
+    "features.notiffilter.title": "Notification Filter",
+    "features.notiffilter.desc": "Filter apps by notification status: all, notifications on, or notifications off.",
+    "downloads.title": "Downloads",
+    "downloads.subtitle": "Single binary, zero external dependencies. The frontend is embedded in the executable.",
+    "downloads.linux.title": "Linux",
+    "downloads.linux.desc": "Tarball with binary + install.sh. Compatible with any distro (Go 1.21+).",
+    "downloads.linux.cta": "Download .tar.gz",
+    "downloads.windows.title": "Windows",
+    "downloads.windows.desc": "NSIS installer. Includes embedded ADB and license activator.",
+    "downloads.windows.cta": "Download .exe",
+    "downloads.macos.title": "macOS",
+    "downloads.macos.desc": "Binary for macOS. Coming soon.",
+    "downloads.macos.cta": "Download .tar.gz",
+    "sub.title": "Subscription Plans",
+    "sub.subtitle": "Choose the plan that best fits your needs. All include updates and support.",
+    "sub.permonth": "/month",
+    "sub.free.title": "Free",
+    "sub.free.f1": "Process monitoring",
+    "sub.free.f2": "Notification management",
+    "sub.free.f3": "Game detection",
+    "sub.free.f4": "1 device",
+    "sub.current": "Current plan",
+    "sub.pro.title": "Pro",
+    "sub.pro.f1": "Everything in Free",
+    "sub.pro.f2": "Full Ads Scanner",
+    "sub.pro.f3": "Smart channel blocking",
+    "sub.pro.f4": "Up to 3 devices",
+    "sub.pro.f5": "Priority support",
+    "sub.cta": "Subscribe",
+    "sub.enterprise.title": "Enterprise",
+    "sub.ent.f1": "Everything in Pro",
+    "sub.ent.f2": "Unlimited devices",
+    "sub.ent.f3": "Dedicated license API",
+    "sub.ent.f4": "Guaranteed SLA",
+    "sub.ent.f5": "Personalized onboarding",
+    "sub.cta2": "Contact us",
+    "sub.contact.intro": "Interested in purchasing a license? Contact us through the following channels:",
+    "sub.coming": "IN DEVELOPMENT",
+    "docs.title": "Technical Documentation",
+    "docs.subtitle": "Complete TPDroid project guide: installation, usage and architecture.",
+    "docs.menu": "\u2630 Section menu",
+    "docs.sidebar.overview": "1. Overview",
+    "docs.sidebar.install": "2. Installation",
+    "docs.sidebar.adb": "3. ADB & Connection",
+    "docs.sidebar.processes": "4. Dashboard \u2014 Processes",
+    "docs.sidebar.apps": "5. Dashboard \u2014 Apps",
+    "docs.sidebar.games": "6. Game Detection",
+    "docs.sidebar.triplelock": "7. Triple-Lock",
+    "docs.sidebar.ads": "8. Ads Scanner",
+    "docs.sidebar.licensing": "9. Licensing System",
+    "docs.sidebar.cicd": "10. CI/CD & Releases",
+    "doc.overview.title": "1. Overview",
+    "doc.overview.p1": "TPDroid is a web desktop application that connects to Android devices via USB (embedded ADB) to manage running processes and installed apps. It allows force-stopping processes, disabling/enabling notifications, and applying deep blocking on games.",
+    "doc.overview.p2": "The frontend is embedded in the Go binary via <code>go:embed</code>. Single binary, zero external dependencies. Backend with Go/Gin, frontend with Tailwind CSS (CDN) and vanilla JS.",
+    "doc.overview.p3": "Includes a 4-layer licensing system using Cloudflare Workers and Supabase, and a FastAPI admin panel for managing license codes.",
+    "doc.overview.arch": "Project Architecture",
+    "doc.install.title": "2. Installation",
+    "doc.install.prereq": "Prerequisites",
+    "doc.install.pr1": "Go 1.21+ (build only)",
+    "doc.install.pr2": "Android device with USB Debugging enabled",
+    "doc.install.pr3": "USB cable",
+    "doc.install.pr4": "No separate ADB installation required",
+    "doc.install.devtitle": "Development mode",
+    "doc.install.devp": "Or manually:",
+    "doc.install.build": "Build by platform",
+    "doc.install.buildp": "The binary includes the embedded frontend. Copy to any machine, run it, open <code>http://localhost:8080</code>.",
+    "doc.adb.title": "3. ADB & Connection",
+    "doc.adb.prep": "Prepare your phone",
+    "doc.adb.s1": "<strong>Settings \u2192 About phone</strong> \u2192 tap <strong>Build number</strong> 7 times",
+    "doc.adb.s2": "<strong>Settings \u2192 Developer options</strong> \u2192 enable <strong>USB Debugging</strong>",
+    "doc.adb.s3": "Keep the phone unlocked",
+    "doc.adb.connect": "Connect",
+    "doc.adb.c1": "Connect the phone via USB",
+    "doc.adb.c2": "The app detects the device automatically (polling every 2s, 60s timeout)",
+    "doc.adb.c3": "Check the phone screen and tap <strong>\"Allow USB debugging\"</strong>",
+    "doc.adb.c4": "Check <strong>\"Always allow\"</strong> to skip future prompts",
+    "doc.adb.heartbeat": "Heartbeat",
+    "doc.adb.heartbeatp": "The app maintains a heartbeat every 2s with disconnection detection and a countdown banner. Uses the Page Visibility API to pause polling when the tab is not visible.",
+    "doc.proc.title": "4. Dashboard \u2014 Processes",
+    "doc.proc.p1": "List of running processes with PID, name, UID and state (R/S/I/Z/T/D).",
+    "doc.proc.f1": "Use <strong>\"Running only\"</strong> to filter active processes",
+    "doc.proc.f2": "Real-time search with debounce",
+    "doc.proc.f3": "Client-side pagination (25 processes per page)",
+    "doc.proc.f4": "<strong>Force Stop</strong> button for user processes",
+    "doc.proc.protect": "System process protection",
+    "doc.proc.protectp": "A process is considered system if its UID is <code>system</code>, <code>root</code> or <code>shell</code>, or its package starts with <code>com.android.</code>, <code>android.</code> or is <code>android</code>. Buttons are disabled in the UI and the backend returns HTTP 403.",
+    "doc.proc.protectp2": "Exception: Chrome (<code>com.android.chrome</code>) and other installable browsers are blockable even with the <code>com.android.*</code> prefix. The <code>IsSystemProcess()</code> function has an explicit allowlist.",
+    "doc.apps.title": "5. Dashboard \u2014 Apps & Notifications",
+    "doc.apps.p1": "List of user apps with package, label and permissions.",
+    "doc.apps.f1": "Search by name/package in real time",
+    "doc.apps.f2": "Button to <strong>Disable/Enable notifications</strong>",
+    "doc.apps.f3": "Games show a badge and get Triple-Lock applied",
+    "doc.apps.f4": "Permissions truncated (max 2) with <strong>\"view\"</strong> button for full list in modal",
+    "doc.apps.f5": "Client-side pagination (20 apps per page)",
+    "doc.games.title": "6. Game Detection",
+    "doc.games.p1": "TPDroid detects games automatically using three strategies in order:",
+    "doc.games.strat1": "1. Package name analysis",
+    "doc.games.strat1p": "Looks for segments like <code>.game</code>, <code>.games</code>, <code>.gaming</code>, <code>game.</code>, <code>games.</code> and suffixes <code>game</code>/<code>games</code>.",
+    "doc.games.strat2": "2. Game engines & Ad SDKs",
+    "doc.games.strat2p": "Detects packages containing: <code>unity</code>, <code>unreal</code>, <code>cocos</code>, <code>ironsource</code>, <code>applovin</code>, <code>vungle</code>, <code>admob</code>, <code>chartboost</code>, <code>tapjoy</code>.",
+    "doc.games.strat3": "3. Permission combo",
+    "doc.games.strat3p": "If an app has <code>VIBRATE</code> + <code>INTERNET</code>, it is considered a game (high probability).",
+    "doc.games.exclusion": "Exclusion list",
+    "doc.games.exclusionp": "Contains ~400 known non-game package prefixes (WhatsApp, Facebook, Chrome, Gmail, etc.). If a package matches, it is immediately discarded as a game.",
+    "doc.games.exclusionp2": "Covered categories: Social & Communication, Browsers, Google Apps, Microsoft, Adobe, Streaming, Banking & Finance, Shopping, Food Delivery, Productivity, Health & Fitness, Maps & Travel, Utilities, VPN & Remote, Amazon Apps, Samsung, Xiaomi (MIUI), Huawei, OnePlus, Oppo, Vivo, Realme, and other OEMs.",
+    "doc.triplelock.title": "7. Triple-Lock for Games (Android 13+)",
+    "doc.triplelock.p1": "When disabling notifications for a game, these 4 commands are applied:",
+    "doc.triplelock.reenable": "When re-enabling:",
+    "doc.triplelock.p2": "Errors from <code>pm</code> are silenced (Android 12- doesn't support these flags). The UI shows a toast confirming deep blocking.",
+    "doc.ads.title": "8. Ads Scanner",
+    "doc.ads.p1": "Detects advertising activity in real time on the device. Package-level notification blocking is not enough because legitimate apps can contain ad SDKs that generate notifications or overlays.",
+    "doc.ads.sources": "Detection sources",
+    "doc.ads.table.signal": "Signal",
+    "doc.ads.table.cmd": "ADB Command",
+    "doc.ads.table.detect": "What it detects",
+    "doc.ads.table.r1": "Active notifications right now",
+    "doc.ads.table.r2": "Browser push notifications",
+    "doc.ads.table.r3": "Recurring alarms with SDK tags",
+    "doc.ads.table.r4": "Active TYPE_APPLICATION_OVERLAY windows",
+    "doc.ads.block": "Block command",
+    "doc.ads.channel": "Smart channel blocking (SDK-aware)",
+    "doc.ads.channelp": "The system detects the device SDK version and adapts the strategy:",
+    "doc.ads.table.sdk": "SDK (Android)",
+    "doc.ads.table.strat": "Strategy",
+    "doc.ads.table.sdk1": "<code>cmd notification disable-channel</code> \u2014 blocks only the intrusive channel",
+    "doc.ads.table.sdk2": "<code>appops set POST_NOTIFICATION deny</code> \u2014 full block",
+    "doc.ads.limits": "Known limitations",
+    "doc.ads.l1": "<code>dumpsys notification --noredact</code> requires ADB debug mode",
+    "doc.ads.l2": "On Android 12+ some notifications have redacted text",
+    "doc.ads.l3": "Alarms without explicit tags may go undetected",
+    "doc.ads.l4": "Chrome blocking blocks ALL web notifications, not just ads",
+    "doc.ads.l5": "After force-stop, if the user opens the app, the SDK may re-register alarms",
+    "doc.ads.endpoints": "Endpoints",
+    "doc.ads.table.desc": "Description",
+    "doc.ads.table.e1": "Runs all 3 dumpsys, parses and returns unified list",
+    "doc.ads.table.e2": "Revokes overlay + blocks notifications + force-stop (accepts channels and SDK)",
+    "doc.ads.table.e3": "Restores overlay + re-enables notifications (symmetric)",
+    "doc.ads.table.e4": "Explicit full block, ignores channels and SDK",
+    "doc.lic.title": "9. Licensing System",
+    "doc.lic.p1": "4-phase DRM for the compiled TPDroid binary, using Cloudflare Workers and Supabase.",
+    "doc.lic.arch": "Architecture",
+    "doc.lic.flow": "Activation flow",
+    "doc.lic.f1": "Developer generates a code in the Admin Panel \u2192 saved to Supabase",
+    "doc.lic.f2": "Client runs <code>TPDroid-Setup.exe</code> (or <code>install.sh</code> on Linux)",
+    "doc.lic.f3": "The installer runs <code>activator</code> which opens a form in the browser",
+    "doc.lic.f4": "User enters the license code",
+    "doc.lic.f5": "<code>activator</code> gets the hardware fingerprint (SHA-256)",
+    "doc.lic.f6": "Sends <code>{codigo, hw_id, email}</code> to the Worker (<code>POST /activar</code>)",
+    "doc.lic.f7": "Worker validates in Supabase: code exists and is not used",
+    "doc.lic.f8": "If ok: marks as used, generates <code>.lic</code> file signed with HMAC",
+    "doc.lic.f9": "<code>activator</code> saves <code>.lic</code> and returns exit code 0",
+    "doc.lic.f10": "If error: shows message, returns exit code \u2260 0",
+    "doc.lic.f11": "The installer checks the exit code",
+    "doc.lic.reval": "Revalidation flow",
+    "doc.lic.r1": "Backend starts and reads the <code>.lic</code> file",
+    "doc.lic.r2": "Sends <code>.lic</code> + <code>current_hw_id</code> to Worker (<code>POST /revalidar</code>)",
+    "doc.lic.r3": "Worker validates: HMAC, hw_id vs registered, Supabase status",
+    "doc.lic.r4": "If ok: backend runs normally",
+    "doc.lic.r5": "If fails: all <code>/api/*</code> routes return 403, serves <code>license-error.html</code>",
+    "doc.lic.security": "Security layers",
+    "doc.lic.s1": "<strong>Layer 1</strong> (installer): <code>activator</code> prevents installation if code is invalid",
+    "doc.lic.s2": "<strong>Layer 2</strong> (backend): revalidation against Worker on every app startup",
+    "doc.lic.s3": "<strong>HMAC signing</strong>: <code>.lic</code> is signed, cannot be forged without the Worker secret",
+    "doc.lic.s4": "<strong>Hardware binding</strong>: <code>.lic</code> is tied to <code>hw_id</code>, won't work on another machine",
+    "doc.lic.worker": "Worker endpoints",
+    "doc.lic.table.desc": "Description",
+    "doc.lic.table.component": "Component",
+    "doc.lic.table.e1": "Activates a code with hw_id and optional email, generates signed .lic",
+    "doc.lic.table.e2": "Revalidates an existing .lic against Supabase",
+    "doc.lic.table.e3": "Revokes a license (requires X-Admin-Secret)",
+    "doc.lic.env": "Environment variables",
+    "doc.lic.table.var1": "Supabase project URL",
+    "doc.lic.table.var2": "Service role key",
+    "doc.lic.table.var3": "HMAC secret for signing .lic",
+    "doc.lic.table.var4": "Worker URL",
+    "doc.lic.table.var5": "Supabase project URL",
+    "doc.lic.table.var5b": "Embedded HTTP port (0 = random)",
+    "doc.lic.table.var6": "Supabase project URL",
+    "doc.lic.table.var7": "Service role key",
+    "doc.lic.table.var8": "Admin authentication key",
+    "doc.lic.states": "License states",
+    "doc.lic.table.state": "State",
+    "doc.lic.table.st1": "Can be activated",
+    "doc.lic.table.st2": "In use by a machine",
+    "doc.lic.table.st3": "Disabled by admin, cannot activate or revalidate",
+    "doc.lic.schema": "SQL Schema (Supabase)",
+    "doc.cicd.title": "10. CI/CD & Releases",
+    "doc.cicd.p1": "Releases are generated <strong>only when the developer decides to version</strong>, not on every push.",
+    "doc.cicd.trigger": "Trigger a release",
+    "doc.cicd.p2": "This runs the <code>release.yml</code> workflow which:",
+    "doc.cicd.s1": "Compiles backend Go + activator for Linux, Windows and macOS",
+    "doc.cicd.s2": "Packages <code>dist/tpdroid-linux.tar.gz</code> (Linux tarball with install.sh)",
+    "doc.cicd.s3": "Generates <code>dist/TPDroid-Setup.exe</code> (Windows NSIS installer)",
+    "doc.cicd.s4": "Creates a <strong>draft release</strong> on GitHub with both files",
+    "doc.cicd.p3": "<code>LICENSE_WORKER_URL</code> is taken from <code>api_admin/.env</code> automatically.",
+    "doc.cicd.publish": "Publish the release",
+    "doc.cicd.p1i": "Go to <strong>GitHub \u2192 Releases \u2192 Drafts</strong>",
+    "doc.cicd.p2i": "Review the artifacts, edit description if needed",
+    "doc.cicd.p3i": "Click <strong>\"Publish release\"</strong>",
+    "doc.cicd.manual": "Manual trigger",
+    "doc.cicd.manualp": "From <strong>GitHub \u2192 Actions \u2192 Build and Release \u2192 Run workflow</strong> (useful for testing).",
+    "footer.copyright": "\u00a9 2026 TPDroid. All rights reserved."
+  }
+};
+let currentLang = "es";
+function applyLang(lang) {
+  const dict = i18n[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.setAttribute("data-lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key] !== undefined) {
+      el.innerHTML = dict[key];
+    }
+  });
+  document.querySelector(".lang-toggle").textContent = lang === "es" ? "EN" : "ES";
+}
+function toggleLang() {
+  currentLang = currentLang === "es" ? "en" : "es";
+  applyLang(currentLang);
+}
+function toggleSidebar() {
+  document.querySelector(".docs-sidebar").classList.toggle("open");
+}
+document.querySelectorAll(".docs-sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    document.querySelector(".docs-sidebar").classList.remove("open");
+    document.querySelectorAll(".docs-sidebar a").forEach(a => a.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll(".docs-sidebar a").forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + id);
+      });
+    }
+  });
+}, { rootMargin: "-80px 0px -50% 0px" });
+document.querySelectorAll(".docs-section").forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

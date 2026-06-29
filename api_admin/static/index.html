@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPDroid - Admin Licencias</title>
+  <link rel="icon" type="image/png" href="/static/tpdroid-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { dark: '#0f172a' } } } }
+  </script>
+</head>
+<body class="bg-[#0f172a] text-gray-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <header class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700">
+      <img src="/static/tpdroid-icon-without-background.png" alt="TPDroid" class="h-9 w-9">
+      <h1 class="text-2xl font-bold">Panel de Administración de Licencias</h1>
+    </header>
+
+    <!-- Section 1: Auth -->
+    <div id="section-auth" class="bg-slate-800 rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-4">Autenticación</h2>
+      <div class="flex gap-3 items-end">
+        <div class="flex-1">
+          <label class="block text-sm text-gray-400 mb-1">API Key</label>
+          <input type="password" id="api-key-input" class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" placeholder="Ingresá tu API Key">
+        </div>
+        <button id="btn-connect" class="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded font-medium">Conectar</button>
+      </div>
+      <div id="auth-error" class="text-red-400 text-sm mt-2 hidden"></div>
+    </div>
+
+    <!-- Sections that require auth -->
+    <div id="authenticated-sections" class="hidden">
+
+      <!-- Section 2: Stats -->
+      <div id="section-stats" class="bg-slate-800 rounded-lg p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Estadísticas</h2>
+          <button id="btn-refresh-stats" class="text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded">Actualizar</button>
+        </div>
+        <div class="grid grid-cols-4 gap-4">
+          <div class="bg-slate-700 rounded p-4 text-center">
+            <div class="text-3xl font-bold" id="stat-total">-</div>
+            <div class="text-sm text-gray-400 mt-1">Total</div>
+          </div>
+          <div class="bg-slate-700 rounded p-4 text-center">
+            <div class="text-3xl font-bold text-green-400" id="stat-activas">-</div>
+            <div class="text-sm text-gray-400 mt-1">Activas</div>
+          </div>
+          <div class="bg-slate-700 rounded p-4 text-center">
+            <div class="text-3xl font-bold text-red-400" id="stat-revocadas">-</div>
+            <div class="text-sm text-gray-400 mt-1">Revocadas</div>
+          </div>
+          <div class="bg-slate-700 rounded p-4 text-center">
+            <div class="text-3xl font-bold text-yellow-400" id="stat-disponibles">-</div>
+            <div class="text-sm text-gray-400 mt-1">Disponibles</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Generate -->
+      <div id="section-generate" class="bg-slate-800 rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Generar códigos</h2>
+        <div class="flex gap-3 items-end mb-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-1">Cantidad (1-100)</label>
+            <input type="number" id="generate-cantidad" value="10" min="1" max="100" class="w-24 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500">
+          </div>
+          <button id="btn-generate" class="bg-green-600 hover:bg-green-700 px-5 py-2 rounded font-medium">Generar</button>
+        </div>
+        <div id="generate-error" class="text-red-400 text-sm mb-2 hidden"></div>
+        <div id="generate-result" class="hidden">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm text-gray-400">Códigos generados:</span>
+            <button id="btn-copy" class="text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded">Copiar todo</button>
+          </div>
+          <textarea id="generate-codes-textarea" readonly class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-gray-100 font-mono text-sm h-32 focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <!-- Section 4: License List -->
+      <div id="section-list" class="bg-slate-800 rounded-lg p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Lista de Licencias</h2>
+          <button id="btn-refresh-list" class="text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded">Actualizar lista</button>
+        </div>
+        <div id="list-error" class="text-red-400 text-sm mb-2 hidden"></div>
+        <!-- Filter bar -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input type="text" id="search-licenses" class="flex-1 min-w-[200px] bg-slate-700 border border-slate-600 rounded px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500" placeholder="Buscar por email del usuario...">
+          <select id="filter-license-status" class="bg-slate-700 border border-slate-600 rounded px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500">
+            <option value="all">Todos los estados</option>
+            <option value="disponible">Disponibles</option>
+            <option value="activa">Activas</option>
+            <option value="revocada">Revocadas</option>
+          </select>
+          <span id="license-count" class="text-sm text-gray-400 self-center"></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-gray-400 border-b border-slate-600">
+                <th class="text-left py-2 px-2">Código</th>
+                <th class="text-left py-2 px-2">Estado</th>
+                <th class="text-left py-2 px-2">Email</th>
+                <th class="text-left py-2 px-2">Equipo</th>
+                <th class="text-left py-2 px-2">Fecha activación</th>
+                <th class="text-left py-2 px-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="licenses-tbody"></tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div id="pagination-licenses" class="flex items-center justify-center gap-3 mt-4 hidden">
+          <button id="btn-lic-prev" class="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded text-sm disabled:opacity-40" disabled>Anterior</button>
+          <span id="lic-page-info" class="text-sm text-gray-400"></span>
+          <button id="btn-lic-next" class="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded text-sm disabled:opacity-40" disabled>Siguiente</button>
+        </div>
+        <div id="list-empty" class="text-center text-gray-500 py-8 hidden">No hay licencias registradas.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY_KEY = 'tpdroid_admin_api_key';
+
+    function getApiKey() {
+      return sessionStorage.getItem(API_KEY_KEY) || '';
+    }
+
+    function setApiKey(key) {
+      sessionStorage.setItem(API_KEY_KEY, key);
+    }
+
+    function showAuthError(msg) {
+      const el = document.getElementById('auth-error');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideAuthError() {
+      document.getElementById('auth-error').classList.add('hidden');
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideError(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function statusChip(usado, revocado) {
+      if (revocado) return '<span class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">Revocada</span>';
+      if (usado) return '<span class="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">Activa</span>';
+      return '<span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">Disponible</span>';
+    }
+
+    function truncate(s, n) {
+      if (!s) return '-';
+      return s.length > n ? s.slice(0, n) + '...' : s;
+    }
+
+    async function apiFetch(path, options = {}) {
+      const key = getApiKey();
+      const headers = { ...options.headers };
+      if (key) headers['X-API-Key'] = key;
+      const res = await fetch(path, { ...options, headers });
+      if (res.status === 403) {
+        sessionStorage.removeItem(API_KEY_KEY);
+        document.getElementById('authenticated-sections').classList.add('hidden');
+        showAuthError('Sesión expirada. Reingresá la API Key.');
+        return null;
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(data.detail || `Error ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.dataset.originalText = btn.textContent;
+        btn.innerHTML = '<svg class="animate-spin h-4 w-4 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Cargando...';
+        btn.disabled = true;
+      } else {
+        btn.innerHTML = btn.dataset.originalText || btn.textContent;
+        btn.disabled = false;
+      }
+    }
+
+    async function loadStats() {
+      try {
+        setLoading('btn-refresh-stats', true);
+        hideError('list-error');
+        const data = await apiFetch('/api/stats');
+        if (!data) return;
+        document.getElementById('stat-total').textContent = data.total;
+        document.getElementById('stat-activas').textContent = data.activas;
+        document.getElementById('stat-revocadas').textContent = data.revocadas;
+        document.getElementById('stat-disponibles').textContent = data.disponibles;
+      } catch (e) {
+        showError('list-error', 'Error al cargar estadísticas: ' + e.message);
+      } finally {
+        setLoading('btn-refresh-stats', false);
+      }
+    }
+
+    let licPage = 1;
+    let licTotalPages = 1;
+    let licTotal = 0;
+
+    async function loadLicenses(page) {
+      try {
+        setLoading('btn-refresh-list', true);
+        hideError('list-error');
+        const search = document.getElementById('search-licenses').value || '';
+        const statusFilter = document.getElementById('filter-license-status').value;
+        const targetPage = page || licPage;
+        let url = `/api/codes?page=${targetPage}&limit=15`;
+        if (search) url += '&email=' + encodeURIComponent(search);
+        if (statusFilter !== 'all') url += '&status=' + statusFilter;
+        const resp = await apiFetch(url);
+        if (!resp) return;
+        licPage = resp.page;
+        licTotal = resp.total;
+        licTotalPages = resp.total_pages;
+        renderLicensePage(resp.data);
+      } catch (e) {
+        showError('list-error', 'Error al cargar licencias: ' + e.message);
+      } finally {
+        setLoading('btn-refresh-list', false);
+      }
+    }
+
+    function renderLicensePage(data) {
+      const tbody = document.getElementById('licenses-tbody');
+      const empty = document.getElementById('list-empty');
+      const pagination = document.getElementById('pagination-licenses');
+      const pageInfo = document.getElementById('lic-page-info');
+      const prevBtn = document.getElementById('btn-lic-prev');
+      const nextBtn = document.getElementById('btn-lic-next');
+      const countEl = document.getElementById('license-count');
+
+      countEl.textContent = licTotal + ' licencias';
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        pagination.classList.add('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = data.map(lic => {
+        const revocado = lic.revocado || false;
+        const usado = lic.usado || false;
+        const showBtn = !revocado;
+        const btnLabel = usado ? 'Revocar' : 'Eliminar';
+        const btnAction = usado ? 'revocar' : 'eliminar';
+        return `<tr class="border-b border-slate-700 hover:bg-slate-700/50">
+          <td class="py-2 px-2 font-mono text-xs">${lic.codigo}</td>
+          <td class="py-2 px-2">${statusChip(usado, revocado)}</td>
+          <td class="py-2 px-2 text-xs text-gray-400">${lic.email || '-'}</td>
+          <td class="py-2 px-2 text-xs text-gray-400">${truncate(lic.hw_id, 12)}</td>
+          <td class="py-2 px-2 text-xs text-gray-400">${lic.fecha_activacion ? new Date(lic.fecha_activacion).toLocaleString() : '-'}</td>
+          <td class="py-2 px-2">${showBtn ? `<button onclick="deleteCode('${lic.codigo}', '${btnAction}', this)" class="bg-red-600 hover:bg-red-700 text-xs px-3 py-1 rounded">${btnLabel}</button>` : ''}</td>
+        </tr>`;
+      }).join('');
+
+      // Pagination controls
+      if (licTotalPages <= 1) {
+        pagination.classList.add('hidden');
+      } else {
+        pagination.classList.remove('hidden');
+        pageInfo.textContent = 'Página ' + licPage + ' de ' + licTotalPages;
+        prevBtn.disabled = licPage <= 1;
+        nextBtn.disabled = licPage >= licTotalPages;
+      }
+    }
+
+    async function deleteCode(codigo, accion, btn) {
+      const msgs = { revocar: '¿Revocar la licencia ' + codigo + '?', eliminar: '¿Eliminar el código ' + codigo + '? No se puede deshacer.' };
+      if (!confirm(msgs[accion])) return;
+      btn.disabled = true;
+      btn.innerHTML = '<svg class="animate-spin h-3 w-3 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>';
+      try {
+        hideError('list-error');
+        const data = await apiFetch(`/api/codes/${codigo}`, { method: 'DELETE' });
+        if (data) showError('list-error', data.message);
+        setTimeout(() => hideError('list-error'), 3000);
+        await loadLicenses();
+        await loadStats();
+      } catch (e) {
+        showError('list-error', 'Error: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = accion === 'revocar' ? 'Revocar' : 'Eliminar';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Restore API key from session
+      const savedKey = getApiKey();
+      if (savedKey) {
+        document.getElementById('api-key-input').value = savedKey;
+      }
+
+      // Connect
+      document.getElementById('btn-connect').addEventListener('click', async () => {
+        const key = document.getElementById('api-key-input').value.trim();
+        if (!key) {
+          showAuthError('Ingresá una API Key');
+          return;
+        }
+        hideAuthError();
+        setApiKey(key);
+        document.getElementById('btn-connect').textContent = 'Conectando...';
+        document.getElementById('btn-connect').disabled = true;
+        try {
+          await apiFetch('/api/stats');
+          document.getElementById('authenticated-sections').classList.remove('hidden');
+          document.getElementById('btn-connect').textContent = 'Conectado';
+          document.getElementById('btn-connect').disabled = false;
+          loadStats();
+          loadLicenses();
+        } catch (e) {
+          showAuthError('Error de autenticación: ' + e.message);
+          sessionStorage.removeItem(API_KEY_KEY);
+          document.getElementById('btn-connect').textContent = 'Conectar';
+          document.getElementById('btn-connect').disabled = false;
+        }
+      });
+
+      // Refresh stats
+      document.getElementById('btn-refresh-stats').addEventListener('click', loadStats);
+
+      // Refresh list
+      document.getElementById('btn-refresh-list').addEventListener('click', loadLicenses);
+
+      // Search & filter
+      document.getElementById('search-licenses').addEventListener('input', () => {
+        licPage = 1;
+        loadLicenses(1);
+      });
+      document.getElementById('filter-license-status').addEventListener('change', () => {
+        licPage = 1;
+        loadLicenses(1);
+      });
+
+      // Pagination
+      document.getElementById('btn-lic-prev').addEventListener('click', () => {
+        if (licPage > 1) { loadLicenses(licPage - 1); }
+      });
+      document.getElementById('btn-lic-next').addEventListener('click', () => {
+        if (licPage < licTotalPages) { loadLicenses(licPage + 1); }
+      });
+
+      // Generate codes
+      document.getElementById('btn-generate').addEventListener('click', async () => {
+        const cantidad = parseInt(document.getElementById('generate-cantidad').value);
+        if (isNaN(cantidad) || cantidad < 1 || cantidad > 100) {
+          showError('generate-error', 'La cantidad debe ser entre 1 y 100');
+          return;
+        }
+        hideError('generate-error');
+        document.getElementById('btn-generate').textContent = 'Generando...';
+        document.getElementById('btn-generate').disabled = true;
+        try {
+          const data = await apiFetch('/api/codes/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cantidad }),
+          });
+          if (!data) return;
+          document.getElementById('generate-codes-textarea').value = data.codigos.join('\n');
+          document.getElementById('generate-result').classList.remove('hidden');
+          document.getElementById('btn-generate').textContent = 'Generar';
+          document.getElementById('btn-generate').disabled = false;
+          loadStats();
+          loadLicenses();
+        } catch (e) {
+          showError('generate-error', 'Error al generar: ' + e.message);
+          document.getElementById('btn-generate').textContent = 'Generar';
+          document.getElementById('btn-generate').disabled = false;
+        }
+      });
+
+      // Copy all
+      document.getElementById('btn-copy').addEventListener('click', () => {
+        const ta = document.getElementById('generate-codes-textarea');
+        ta.select();
+        navigator.clipboard.writeText(ta.value).catch(() => {});
+      });
+
+      // Auto-connect if key in session
+      if (savedKey) {
+        document.getElementById('btn-connect').click();
+      }
+    });
+  </script>
+</body>
+</html>
