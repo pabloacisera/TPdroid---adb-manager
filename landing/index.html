@@ -214,17 +214,20 @@ strong { color: #F9FAFB; }
       <div class="download-card">
         <h3 data-i18n="downloads.linux.title">Linux</h3>
         <p data-i18n="downloads.linux.desc">Binario listo para ejecutar. Incluye instalador automático (solo requiere Linux x64).</p>
-        <a href="#" class="btn btn-outline" data-i18n="downloads.linux.cta">Descargar .tar.gz</a>
+        <a href="https://github.com/pabloacisera/TPdroid---adb-manager/releases/download/v0.1.0/tpdroid-linux.tar.gz" class="btn btn-outline" data-i18n="downloads.linux.cta">Descargar .tar.gz</a>
       </div>
       <div class="download-card">
         <h3 data-i18n="downloads.windows.title">Windows</h3>
         <p data-i18n="downloads.windows.desc">Instalador NSIS. Incluye ADB embebido y activator de licencia.</p>
-        <a href="#" class="btn btn-outline" data-i18n="downloads.windows.cta">Descargar .exe</a>
+        <a href="https://github.com/pabloacisera/TPdroid---adb-manager/releases/download/v0.1.0/TPDroid-Setup.exe" class="btn btn-outline" data-i18n="downloads.windows.cta">Descargar .exe</a>
       </div>
       <div class="download-card">
         <h3 data-i18n="downloads.macos.title">macOS</h3>
         <p data-i18n="downloads.macos.desc">Binario universal para Apple Silicon (M1/M2/M3) e Intel (x64). Incluye script de instalación.</p>
-        <a href="#" class="btn btn-outline" data-i18n="downloads.macos.cta">Descargar .tar.gz</a>
+        <div style="display:flex; gap:0.75rem; margin-top:auto;">
+          <a href="https://github.com/pabloacisera/TPdroid---adb-manager/releases/download/v0.1.0/tpdroid-macos-arm64.tar.gz" class="btn btn-outline" style="flex:1" data-i18n="downloads.macos.arm64">Apple Silicon</a>
+          <a href="https://github.com/pabloacisera/TPdroid---adb-manager/releases/download/v0.1.0/tpdroid-macos-amd64.tar.gz" class="btn btn-outline" style="flex:1" data-i18n="downloads.macos.amd64">Intel (x64)</a>
+        </div>
       </div>
     </div>
   </div>
@@ -644,7 +647,8 @@ const i18n = {
     "downloads.windows.cta": "Descargar .exe",
     "downloads.macos.title": "macOS",
     "downloads.macos.desc": "Binario para macOS. Pr\u00f3ximamente disponible.",
-    "downloads.macos.cta": "Descargar .tar.gz",
+    "downloads.macos.arm64": "Apple Silicon",
+    "downloads.macos.amd64": "Intel (x64)",
     "sub.title": "Planes de Suscripci\u00f3n",
     "sub.subtitle": "Eleg\u00ed el plan que mejor se adapte a tus necesidades. Todos incluyen actualizaciones y soporte.",
     "sub.permonth": "/mes",
@@ -877,6 +881,8 @@ const i18n = {
     "downloads.macos.title": "macOS",
     "downloads.macos.desc": "Binary for macOS. Coming soon.",
     "downloads.macos.cta": "Download .tar.gz",
+    "downloads.macos.arm64": "Apple Silicon",
+    "downloads.macos.amd64": "Intel (x64)",
     "sub.title": "Subscription Plans",
     "sub.subtitle": "Choose the plan that best fits your needs. All include updates and support.",
     "sub.permonth": "/month",
