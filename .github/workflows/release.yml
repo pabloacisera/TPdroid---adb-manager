@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       LICENSE_WORKER_URL: ${{ secrets.LICENSE_WORKER_URL }}
     steps:
