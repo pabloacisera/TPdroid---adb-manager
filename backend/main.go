@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//go:embed frontend
+//go:embed ui
 var frontendEmbed embed.FS
 
 func main() {
@@ -70,7 +70,7 @@ func main() {
 			api.POST("/ads/block-full", h.BlockAdSourceFull)
 		}
 
-		frontendFS, _ := fs.Sub(frontendEmbed, "frontend")
+		frontendFS, _ := fs.Sub(frontendEmbed, "ui")
 		fileServer := http.FileServer(http.FS(frontendFS))
 
 		r.NoRoute(func(c *gin.Context) {

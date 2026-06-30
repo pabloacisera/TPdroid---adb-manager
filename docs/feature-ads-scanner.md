@@ -47,12 +47,12 @@ Si el usuario ve notificaciones de publicidad que vienen del navegador, la entra
 | `backend/adb/client.go` | + `GetActiveNotifications`, `parseActiveNotifications`, `GetAdAlarms`, `parseAdAlarms`, `GetActiveOverlays`, `parseActiveOverlays`, `ScanAdSources`, `BlockAdSource`, `UnblockAdSource` |
 | `backend/handlers/ads.go` | Archivo nuevo: handlers `GetAdScan`, `BlockAdSource`, `UnblockAdSource` |
 | `backend/main.go` | + 3 rutas bajo `/api/ads/` |
-| `backend/frontend/js/api.js` | + `scanAds()`, `blockAd()`, `unblockAd()` |
-| `backend/frontend/js/i18n.js` | + clave `tabs.ads` y claves `ads.*` en EN y ES |
-| `backend/frontend/js/ui.js` | + `renderAdTable()` |
-| `backend/frontend/js/app.js` | + `renderAdTable` al import existente de ui.js; + lógica del tab ads |
-| `backend/frontend/index.html` | + tab button `tab-ads` y panel `tab-ads-content` |
-| `backend/frontend/css/styles.css` | + estilos `ads-badge-*`, `ads-channel`, `ads-alarm-tag`, `ads-blocked-row` |
+| `backend/ui/js/api.js` | + `scanAds()`, `blockAd()`, `unblockAd()` |
+| `backend/ui/js/i18n.js` | + clave `tabs.ads` y claves `ads.*` en EN y ES |
+| `backend/ui/js/ui.js` | + `renderAdTable()` |
+| `backend/ui/js/app.js` | + `renderAdTable` al import existente de ui.js; + lógica del tab ads |
+| `backend/ui/index.html` | + tab button `tab-ads` y panel `tab-ads-content` |
+| `backend/ui/css/styles.css` | + estilos `ads-badge-*`, `ads-channel`, `ads-alarm-tag`, `ads-blocked-row` |
 
 ## Limitaciones conocidas
 

@@ -40,8 +40,8 @@ Los errores de `pm` en Android < 13 se ignoran silenciosamente.
 |---------|--------|
 | `backend/adb/client.go` | `IsGameApp()`, `isKnownNonGame()`, modificación de `DisableNotifications`/`EnableNotifications` para aceptar `isGame` |
 | `backend/handlers/apps.go` | Handlers leen `is_game` del body |
-| `backend/frontend/js/api.js` | `disableNotification()`/`enableNotification()` envían `is_game` |
-| `backend/frontend/js/ui.js` | `renderAppsTable()` muestra badge + `data-is-game` |
-| `backend/frontend/js/app.js` | Click handlers pasan `isGame` a la API |
-| `backend/frontend/js/i18n.js` | Claves `badges.game`, `toast.gameLocked` |
-| `backend/frontend/css/styles.css` | `.badge-game` |
+| `backend/ui/js/api.js` | `disableNotification()`/`enableNotification()` envían `is_game` |
+| `backend/ui/js/ui.js` | `renderAppsTable()` muestra badge + `data-is-game` |
+| `backend/ui/js/app.js` | Click handlers pasan `isGame` a la API |
+| `backend/ui/js/i18n.js` | Claves `badges.game`, `toast.gameLocked` |
+| `backend/ui/css/styles.css` | `.badge-game` |

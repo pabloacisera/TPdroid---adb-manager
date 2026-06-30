@@ -73,6 +73,9 @@ strong { color: #F9FAFB; }
 .download-card h3 { margin-bottom: 0.5rem; }
 .download-card p { font-size: 0.9rem; color: #9CA3AF; margin-bottom: 1.5rem; flex: 1; }
 .download-card .btn { width: 100%; margin-top: auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.is-loading { position: relative; color: transparent !important; pointer-events: none; }
+.btn.is-loading::after { content: ''; position: absolute; top: 50%; left: 50%; width: 1em; height: 1em; margin: -0.5em 0 0 -0.5em; border: 2px solid #60A5FA; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
 /* Subscription */
 .subscription-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
 .sub-card { background: #1F2937; border: 1px solid #4B5563; border-radius: 12px; padding: 2rem; text-align: center; }
@@ -1112,6 +1115,16 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { rootMargin: "-80px 0px -50% 0px" });
 document.querySelectorAll(".docs-section").forEach(s => observer.observe(s));
+document.querySelectorAll('.download-card .btn').forEach(btn => {
+  btn.addEventListener('click', function (e) {
+    if (this.classList.contains('is-loading')) return;
+    e.preventDefault();
+    const href = this.getAttribute('href');
+    if (!href) return;
+    this.classList.add('is-loading');
+    setTimeout(() => { window.location.href = href; }, 1300);
+  });
+});
 </script>
 </body>
 </html>

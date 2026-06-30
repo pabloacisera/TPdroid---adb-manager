@@ -2,26 +2,7 @@
 
 La landing page es un sitio estático (HTML + CSS inline + JS vanilla) en el directorio `landing/`. Sin frameworks, sin build steps.
 
-## Deploy en Render.com
-
-### Opción 1: Static Site (recomendada)
-
-1. Ir a [Render Dashboard → New → Static Site](https://dashboard.render.com/select-repo?type=static)
-2. Conectar el repositorio
-3. Configurar:
-
-   | Campo | Valor |
-   |-------|-------|
-   | **Name** | `tpdroid-landing` |
-   | **Root Directory** | `landing` |
-   | **Build Command** | _vacío_ (no necesita build) |
-   | **Publish Directory** | `.` (el root es `landing/`) |
-
-4. Hacer clic en **Create Static Site**
-
-Render deploya automáticamente en cada push a la rama principal.
-
-### Opción 2: Cloudflare Pages (alternativa)
+## Deploy en Cloudflare Pages
 
 1. Ir a [Cloudflare Dashboard → Workers & Pages → Create → Pages](https://dash.cloudflare.com/)
 2. Conectar el repositorio
@@ -35,6 +16,8 @@ Render deploya automáticamente en cada push a la rama principal.
    | **Build output directory** | `landing` |
 
 4. Hacer clic en **Save and Deploy**
+
+Cloudflare Pages deploya automáticamente en cada push a `main`.
 
 ## Personalizar
 

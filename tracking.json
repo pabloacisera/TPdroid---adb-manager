@@ -40,7 +40,7 @@
       "8.3_frontend_check": { "title": "Frontend check", "status": "completed", "notes": ["JS syntax OK"], "decisions": [] }
     }},
     "9_refactor_go_embed": { "title": "Refactor: go:embed + servir frontend desde Go", "tasks": {
-      "9.1_move_frontend": { "title": "Mover frontend/ dentro de backend/", "status": "completed", "notes": ["frontend/ → backend/frontend/ para que go:embed funcione"], "decisions": [] },
+      "9.1_move_frontend": { "title": "Mover frontend/ dentro de backend/", "status": "completed", "notes": ["frontend/ → backend/ui/ para que go:embed funcione"], "decisions": [] },
       "9.2_embed_frontend": { "title": "Implementar go:embed en main.go", "status": "completed", "notes": ["embed.FS + fs.Sub + r.NoRoute con http.FileServer"], "decisions": ["Usar NoRoute en vez de StaticFS para evitar conflicto con rutas /api"] },
       "9.3_remove_cors": { "title": "Eliminar gin-contrib/cors", "status": "completed", "notes": ["Mismo origen, no necesita CORS"], "decisions": [] },
       "9.4_restore_es6_modules": { "title": "Restaurar import/export nativos en JS", "status": "completed", "notes": ["type='module', single script tag, sin globales"], "decisions": ["Ya no hay variables globales — ES6 modules nativos funcionan al servirse desde Go"] },
@@ -138,7 +138,7 @@
     { "task": "15.4b", "error": "main.go: else block sin closing brace + indentación incorrecta", "solution": "Reescribir main.go completo con estructura limpia: if !licenseValid { middleware } else { routes }" }
   ],
   "technical_decisions": [
-    { "decision": "go:embed para servir frontend", "context": "Eliminar dependencia de file://, permitir ES6 modules nativos, un solo binario", "detail": "Frontend movido a backend/frontend/, embebido con //go:embed, servido via http.FileServer en r.NoRoute" },
+    { "decision": "go:embed para servir frontend", "context": "Eliminar dependencia de file://, permitir ES6 modules nativos, un solo binario", "detail": "Frontend movido a backend/ui/, embebido con //go:embed, servido via http.FileServer en r.NoRoute" },
     { "decision": "Sin CORS ni gin-contrib/cors", "context": "Frontend y API mismo origen (localhost:8080)", "detail": "Se eliminó la dependencia de gin-contrib/cors, no es necesaria con mismo origen" },
     { "decision": "Ruta relativa /api en frontend", "context": "Mismo origen, no necesita URL absoluta", "detail": "api.js usa const BASE = '/api' en vez de 'http://localhost:8080/api'" },
     { "decision": "Handler struct pattern", "context": "Handlers comparten ADB path y device serial", "detail": "handlers/handler.go con Handler struct, New() constructor, ResolveSerial()" },
