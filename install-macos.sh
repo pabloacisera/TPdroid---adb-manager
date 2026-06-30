@@ -77,7 +77,10 @@ cat > "$INSTALL_DIR/tpdroid.sh" << 'SCRIPT'
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 export ADB_PATH="$DIR/adb-binaries/macos/adb"
-exec "$DIR/tpdroid"
+"$DIR/tpdroid" &
+sleep 2
+open "http://localhost:8080"
+wait
 SCRIPT
 chmod +x "$INSTALL_DIR/tpdroid.sh"
 

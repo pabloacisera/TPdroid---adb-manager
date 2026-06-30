@@ -1,0 +1,10 @@
+name = "tpdroid-landing"
+main = "src/index.js"
+compatibility_date = "2026-06-30"
+workers_dev = true
+
+routes = [{ pattern = "tpdroid.artisandevs.site", custom_domain = true }]
+
+[assets]
+directory = "./"
+binding = "ASSETS"

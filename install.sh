@@ -58,7 +58,10 @@ cat > "$INSTALL_DIR/tpdroid.sh" << 'SCRIPT'
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 export ADB_PATH="$DIR/adb-binaries/linux/adb"
-exec "$DIR/tpdroid"
+"$DIR/tpdroid" &
+sleep 2
+xdg-open "http://localhost:8080" >/dev/null 2>&1
+wait
 SCRIPT
 chmod +x "$INSTALL_DIR/tpdroid.sh"
 
