@@ -1122,7 +1122,7 @@ document.querySelectorAll('.download-card .btn').forEach(btn => {
     const href = this.getAttribute('href');
     if (!href) return;
     this.classList.add('is-loading');
-    setTimeout(() => { window.location.href = href; }, 1300);
+    setTimeout(() => { window.location.href = href; this.classList.remove('is-loading'); }, 1300);
   });
 });
 </script>
