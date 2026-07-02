@@ -1,3 +1,6 @@
+VERSION ?= dev
+LDFLAGS := -ldflags="-X main.Version=$(VERSION)"
+
 .PHONY: dev build-linux build-windows build-macos build-all
 .PHONY: build-activator-windows build-activator-linux build-activator
 
@@ -5,15 +8,15 @@ dev:
 	cd backend && go run main.go
 
 build-linux:
-	cd backend && GOOS=linux GOARCH=amd64 go build -o ../dist/tpdroid-linux . && \
+	cd backend && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o ../dist/tpdroid-linux . && \
 	cd ../dist && tar czf tpdroid-linux.tar.gz tpdroid-linux && rm tpdroid-linux
 
 build-windows:
-	cd backend && GOOS=windows GOARCH=amd64 go build -o ../dist/tpdroid.exe .
+	cd backend && GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o ../dist/tpdroid.exe .
 
 build-macos:
-	cd backend && GOOS=darwin GOARCH=amd64 go build -o ../dist/tpdroid-macos-amd64 . && \
-	GOOS=darwin GOARCH=arm64 go build -o ../dist/tpdroid-macos-arm64 . && \
+	cd backend && GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o ../dist/tpdroid-macos-amd64 . && \
+	GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o ../dist/tpdroid-macos-arm64 . && \
 	cd ../dist && tar czf tpdroid-macos-amd64.tar.gz tpdroid-macos-amd64 && \
 	tar czf tpdroid-macos-arm64.tar.gz tpdroid-macos-arm64 && \
 	rm tpdroid-macos-amd64 tpdroid-macos-arm64

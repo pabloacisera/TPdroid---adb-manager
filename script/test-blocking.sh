@@ -76,6 +76,7 @@ cleanup() {
   if [ -n "$TEST_PKG" ]; then
     echo "   Limpiando: restaurando $TEST_PKG..."
     curl -sf -X POST "$BASE/api/ads/unblock" \
+      "${AUTH_ARGS[@]}" \
       -H "Content-Type: application/json" \
       -d "{\"package\":\"$TEST_PKG\",\"blocked_channels\":[],\"sdk_version\":\"$SDK\"}" >/dev/null 2>&1 || true
   fi
@@ -105,6 +106,17 @@ if ! curl -sf "$BASE/api/status" >/dev/null 2>&1; then
   exit 1
 fi
 echo "   OK"
+
+echo "--- Obteniendo session token ---"
+SESSION_TOKEN=$(curl -sf "$BASE/api/session-token" 2>/dev/null | python3 -c \
+  "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null || echo "")
+AUTH_ARGS=()
+if [ -n "$SESSION_TOKEN" ]; then
+  echo "   Token obtenido"
+  AUTH_ARGS=(-H "X-Session-Token: $SESSION_TOKEN")
+else
+  echo "   ⚠️  No se pudo obtener session token — POST requests podrian fallar con 403"
+fi
 echo ""
 
 # ─── 3. Scan para detectar package de prueba ───────────────
@@ -160,6 +172,7 @@ echo ""
 
 echo "--- 5. Test: bloqueo por canal específico (smart block) ---"
 BLOCK=$(curl -sf -X POST "$BASE/api/ads/block" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\",\"channels\":$TEST_CHANNELS,\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo '{"success":false}')
 BLOCK_OK=$(echo "$BLOCK" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)
@@ -188,6 +201,7 @@ else
   UNBLOCK_CH="$BLOCKED_CH"
 fi
 UNBLOCK=$(curl -sf -X POST "$BASE/api/ads/unblock" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\",\"blocked_channels\":$UNBLOCK_CH,\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo '{"success":false}')
 UNBLOCK_OK=$(echo "$UNBLOCK" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)
@@ -198,6 +212,7 @@ echo ""
 
 echo "--- 6. Test: desbloqueo por canal ---"
 UNBLOCK=$(curl -sf -X POST "$BASE/api/ads/unblock" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\",\"blocked_channels\":$BLOCKED_CH,\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo '{"success":false}')
 UNBLOCK_OK=$(echo "$UNBLOCK" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)
@@ -208,6 +223,7 @@ echo ""
 
 echo "--- 7. Test: bloqueo total (block-full) ---"
 FULL=$(curl -sf -X POST "$BASE/api/ads/block-full" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\"}" 2>/dev/null || echo '{"success":false}')
 FULL_OK=$(echo "$FULL" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)
@@ -223,6 +239,7 @@ echo ""
 
 echo "--- 8. Test: restaurar después de bloqueo total ---"
 RESTORE=$(curl -sf -X POST "$BASE/api/ads/unblock" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\",\"blocked_channels\":[],\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo '{"success":false}')
 RESTORE_OK=$(echo "$RESTORE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)
@@ -237,18 +254,21 @@ echo ""
 echo "--- 9. Test: guard de sistema retorna 403 ---"
 # block
 SYS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/ads/block" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"com.android.systemui\",\"channels\":[],\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo "000")
 check "POST /api/ads/block → systemui → 403" "$([ "$SYS" = "403" ] && echo "ok" || echo "fail")"
 
 # block-full
 SYS2=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/ads/block-full" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"com.android.systemui\"}" 2>/dev/null || echo "000")
 check "POST /api/ads/block-full → systemui → 403" "$([ "$SYS2" = "403" ] && echo "ok" || echo "fail")"
 
 # unblock
 SYS3=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/ads/unblock" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"com.android.systemui\",\"blocked_channels\":[],\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo "000")
 check "POST /api/ads/unblock → systemui → 403" "$([ "$SYS3" = "403" ] && echo "ok" || echo "fail")"
@@ -258,6 +278,7 @@ echo ""
 
 echo "--- 10. Test: smart block sin canales → bloqueo total (fallback) ---"
 BLOCK_NOCH=$(curl -sf -X POST "$BASE/api/ads/block" \
+  "${AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"package\":\"$TEST_PKG\",\"channels\":[],\"sdk_version\":\"$SDK\"}" 2>/dev/null || echo '{"success":false}')
 BLOCK_NOCH_OK=$(echo "$BLOCK_NOCH" | python3 -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null)

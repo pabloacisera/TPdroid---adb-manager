@@ -19,6 +19,9 @@ El frontend está embebido en el binario Go via `go:embed`. Un solo binario, cer
 - **Heartbeat cada 2s** con detección de desconexión y banner con countdown
 - **Page Visibility API** — pausa polling cuando la pestaña no está visible
 - **Bilingüe** — Español e Inglés con toggle en la UI
+- **Notificación de actualizaciones** — campanita en la navbar que consulta versión remota cada 30 min
+- **Definiciones remotas** — listas de detección de juegos actualizables desde Worker sin recompilar
+- **Landing dinámica** — enlaces de descarga resueltos contra versión remota
 - **Protección server-side** de procesos del sistema (HTTP 403)
 
 ## Cómo usar la app
@@ -192,40 +195,36 @@ cd backend && go run main.go
 ## Build por Plataforma
 
 ```bash
-make build-linux   # → dist/tpdroid-linux.tar.gz
-make build-windows # → dist/TPDroid-Setup.exe
-make build-macos   # → dist/tpdroid-macos.tar.gz
+make build-linux              # → dist/tpdroid-linux.tar.gz (VERSION=dev)
+make build-linux VERSION=0.2.0  # → con versión específica
+make build-windows            # → dist/TPDroid-Setup.exe
+make build-macos              # → dist/tpdroid-macos.tar.gz
+make build-all VERSION=0.2.0  # → todas las plataformas
 ```
 
 ## Release Pipeline (CI/CD)
 
+Ver [`docs/release-process.md`](docs/release-process.md) para la guía completa con todos los pasos.
+
 Las releases se generan **solo cuando el desarrollador decide versionar**, no en cada push.
 
-### Disparar una release
+### Resumen rápido
 
 ```bash
-git tag v1.0.0          # Elegí la versión
-git push origin v1.0.0  # → GitHub Actions se activa
+# 1. Taggear y pushear
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 2. Publicar el draft en GitHub → Releases → Drafts
+
+# 3. Actualizar Worker
+cd cloudflare/
+wrangler secret put LATEST_VERSION "X.Y.Z"
+wrangler secret put DOWNLOAD_URL "https://github.com/pabloacisera/TPdroid---adb-manager/releases/download/vX.Y.Z"
+wrangler secret put CHANGELOG "..."
+wrangler secret put NOTES_ES "..."
+wrangler secret put NOTES_EN "..."
 ```
-
-Esto ejecuta el workflow [`release.yml`](.github/workflows/release.yml):
-
-1. **Compila** el backend Go + activator para Linux y Windows
-2. **Empaqueta** `dist/tpdroid-linux.tar.gz` (tarball Linux con install.sh)
-3. **Genera** `dist/TPDroid-Setup.exe` (instalador Windows via NSIS)
-4. **Crea un draft release** en GitHub con ambos archivos
-
-La `LICENSE_WORKER_URL` es la url de un worker de cloudflare.
-
-### Publicar la release
-
-1. Ir a **GitHub → Releases → Drafts**
-2. Revisar los artifacts, editar descripción si hace falta
-3. Hacer clic en **"Publish release"**
-
-### Lanzar manualmente
-
-Desde **GitHub → Actions → Build and Release → Run workflow** (útil para pruebas).
 
 ## ADB Binaries
 
@@ -248,15 +247,22 @@ Los botones de acción aparecen deshabilitados en la UI y el backend retorna HTT
 ```
 ├── backend/
 │   ├── adb/
-│   │   ├── client.go      # Wrappers de comandos ADB
+│   │   ├── client.go      # Wrappers de comandos ADB + game detection
+│   │   ├── definitions.go # Remote definitions fetch + fallback local
 │   │   └── types.go       # Structs de datos
+│   ├── cors/
+│   │   └── cors.go        # Custom CORS middleware
+│   ├── version/
+│   │   └── client.go      # Version cache con background poll
 │   ├── handlers/
 │   │   ├── handler.go     # Handler struct, ResolveSerial
 │   │   ├── status.go      # GET /api/status
 │   │   ├── device.go      # GET /api/device
 │   │   ├── processes.go   # GET /api/processes, POST force-stop
-│   │   └── apps.go        # GET /api/apps, POST disable/enable-notification
-│   ├── frontend/
+│   │   ├── apps.go        # GET /api/apps, POST disable/enable-notification
+│   │   ├── version.go     # GET /api/version
+│   │   └── definitions.go # GET /api/definitions
+│   ├── ui/                # Frontend embebido (go:embed)
 │   │   ├── index.html     # UI con Tailwind CDN
 │   │   ├── css/styles.css # Estilos custom (sin @apply)
 │   │   └── js/

@@ -12,11 +12,13 @@ jobs:
     env:
       LICENSE_WORKER_URL: ${{ secrets.LICENSE_WORKER_URL }}
     steps:
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.26.1'
 
       - name: Install NSIS
         run: sudo apt-get update && sudo apt-get install -y nsis

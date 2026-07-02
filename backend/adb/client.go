@@ -171,6 +171,15 @@ func parseProcesses(output string) []Process {
 	return procs
 }
 
+var gameSegments = []string{
+	".game", ".games", ".gaming", "game.", "games.",
+}
+
+var gameEngines = []string{
+	"unity", "unreal", "cocos", "ironsource", "applovin",
+	"vungle", "admob", "chartboost", "tapjoy",
+}
+
 var knownNonGamePrefixes = []string{
 	// Social & Communication
 	"com.whatsapp", "com.facebook.katana", "com.facebook.orca",
@@ -431,7 +440,7 @@ var knownNonGamePrefixes = []string{
 
 func isKnownNonGame(pkg string) bool {
 	p := strings.ToLower(pkg)
-	for _, prefix := range knownNonGamePrefixes {
+	for _, prefix := range GetKnownNonGamePrefixes() {
 		if strings.HasPrefix(p, prefix) {
 			return true
 		}
@@ -446,10 +455,7 @@ func IsGameApp(pkg string, permissions []string) bool {
 		return false
 	}
 
-	gameSegments := []string{
-		".game", ".games", ".gaming", "game.", "games.",
-	}
-	for _, seg := range gameSegments {
+	for _, seg := range GetGameSegments() {
 		if strings.Contains(p, seg) {
 			return true
 		}
@@ -459,11 +465,7 @@ func IsGameApp(pkg string, permissions []string) bool {
 		return true
 	}
 
-	gameEngines := []string{
-		"unity", "unreal", "cocos", "ironsource", "applovin",
-		"vungle", "admob", "chartboost", "tapjoy",
-	}
-	for _, eng := range gameEngines {
+	for _, eng := range GetGameEngines() {
 		if strings.Contains(p, eng) {
 			return true
 		}
@@ -764,7 +766,7 @@ func shouldFlagAlarm(pkg string, tag string, hasRepeat bool) bool {
 		return false
 	}
 	tagLower := strings.ToLower(tag)
-	for _, kw := range adKeywords {
+	for _, kw := range GetAdKeywords() {
 		if strings.Contains(tagLower, kw) {
 			return true
 		}

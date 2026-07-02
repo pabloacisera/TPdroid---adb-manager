@@ -155,13 +155,13 @@ strong { color: #F9FAFB; }
 <section id="hero" class="hero section">
   <div class="container">
     <div class="hero-badges">
-      <span class="badge badge-blue" data-i18n="hero.badge.go">Go/Gin</span>
-      <span class="badge badge-green" data-i18n="hero.badge.android">Android ADB</span>
-      <span class="badge badge-orange" data-i18n="hero.badge.embed">Frontend Embebido</span>
-      <span class="badge badge-red" data-i18n="hero.badge.license">Licencias</span>
+      <span class="badge badge-blue" data-i18n="hero.badge.noroot">Sin Root</span>
+      <span class="badge badge-green" data-i18n="hero.badge.adsblock">Bloqueo de Ads</span>
+      <span class="badge badge-orange" data-i18n="hero.badge.multidevice">Multi-dispositivo</span>
+      <span class="badge badge-red" data-i18n="hero.badge.plugplay">Plug &amp; Play USB</span>
     </div>
     <h1 data-i18n="hero.title">TPDroid</h1>
-    <p data-i18n="hero.subtitle">Gestor de dispositivos Android v&iacute;a ADB con interfaz web embebida. Procesos, notificaciones, detecci&oacute;n de juegos y bloqueo de anuncios en un solo binario.</p>
+    <p data-i18n="hero.subtitle">Gestion&aacute; tu tel&eacute;fono Android desde la PC. Deten&eacute; procesos, bloque&aacute; notificaciones molestas y limpi&aacute; publicidad. Sin root, sin complicaciones.</p>
     <div class="hero-actions">
       <a href="#downloads" class="btn btn-primary" data-i18n="hero.download">Descargar</a>
       <a href="#docs" class="btn btn-outline" data-i18n="hero.docs">Documentaci&oacute;n</a>
@@ -615,12 +615,12 @@ const i18n = {
     "nav.downloads": "Descargas",
     "nav.subscription": "Suscripci\u00f3n",
     "nav.docs": "Documentaci\u00f3n",
-    "hero.badge.go": "Go/Gin",
-    "hero.badge.android": "Android ADB",
-    "hero.badge.embed": "Frontend Embebido",
-    "hero.badge.license": "Licencias",
+    "hero.badge.noroot": "Sin Root",
+    "hero.badge.adsblock": "Bloqueo de Ads",
+    "hero.badge.multidevice": "Multi-dispositivo",
+    "hero.badge.plugplay": "Plug & Play USB",
     "hero.title": "TPDroid",
-    "hero.subtitle": "Gestor de dispositivos Android v\u00eda ADB con interfaz web embebida. Procesos, notificaciones, detecci\u00f3n de juegos y bloqueo de anuncios en un solo binario.",
+    "hero.subtitle": "Gestion\u00e1 tu tel\u00e9fono Android desde la PC. Deten\u00e9 procesos, bloque\u00e1 notificaciones molestas y limpi\u00e1 publicidad. Sin root, sin complicaciones.",
     "hero.download": "Descargar",
     "hero.docs": "Documentaci\u00f3n",
     "features.title": "Caracter\u00edsticas",
@@ -848,12 +848,12 @@ const i18n = {
     "nav.downloads": "Downloads",
     "nav.subscription": "Subscription",
     "nav.docs": "Documentation",
-    "hero.badge.go": "Go/Gin",
-    "hero.badge.android": "Android ADB",
-    "hero.badge.embed": "Embedded Frontend",
-    "hero.badge.license": "Licensing",
+    "hero.badge.noroot": "No Root",
+    "hero.badge.adsblock": "Ad Blocking",
+    "hero.badge.multidevice": "Multi-device",
+    "hero.badge.plugplay": "Plug & Play USB",
     "hero.title": "TPDroid",
-    "hero.subtitle": "Android device manager via ADB with embedded web interface. Processes, notifications, game detection, and ad blocking in a single binary.",
+    "hero.subtitle": "Manage your Android phone from your PC. Stop processes, block intrusive notifications, and clean ads. No root, no hassle.",
     "hero.download": "Download",
     "hero.docs": "Documentation",
     "features.title": "Features",
@@ -1125,6 +1125,24 @@ document.querySelectorAll('.download-card .btn').forEach(btn => {
     setTimeout(() => { window.location.href = href; this.classList.remove('is-loading'); }, 1300);
   });
 });
+
+// ── Dynamic version fetch ────────────────────────────
+(async function() {
+  const WORKER_URL = 'https://tpdroid-licencias.testdeveloperrandom.workers.dev';
+  try {
+    const res = await fetch(WORKER_URL + '/version');
+    const data = await res.json();
+    const ver = data.latest || '';
+    if (!ver) return;
+    document.querySelectorAll('.download-card a[href*="/releases/download/"]').forEach(el => {
+      const href = el.getAttribute('href');
+      if (!href) return;
+      el.setAttribute('href', href.replace(/v\d+\.\d+\.\d+/, 'v' + ver));
+    });
+  } catch (e) {
+    console.warn('Version fetch failed, using default download links');
+  }
+})();
 </script>
 </body>
 </html>

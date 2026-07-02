@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/android-manager/backend/adb"
+	"github.com/android-manager/backend/version"
 )
 
 const deviceCacheTTL = 3 * time.Second
@@ -13,6 +14,8 @@ type Handler struct {
 	mu      sync.RWMutex
 	AdbPath string
 	Serial  string
+
+	VersionCache *version.Cache
 
 	deviceCache     []adb.DeviceEntry
 	deviceCacheTime time.Time

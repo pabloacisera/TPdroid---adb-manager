@@ -21,10 +21,12 @@ fi
 # 3. Crear dist/ si no existe
 mkdir -p "$DIST_DIR"
 
+VERSION="${VERSION:-dev}"
+
 # 4. Compilar binario Windows
-echo "Compilando tpdroid.exe para Windows..."
+echo "Compilando tpdroid.exe para Windows (v${VERSION})..."
 cd "$SCRIPT_DIR/backend"
-GOOS=windows GOARCH=amd64 go build -o "$DIST_DIR/tpdroid.exe" .
+GOOS=windows GOARCH=amd64 go build -ldflags="-X main.Version=${VERSION}" -o "$DIST_DIR/tpdroid.exe" .
 echo "-> $DIST_DIR/tpdroid.exe"
 
 # 5. Compilar activator.exe

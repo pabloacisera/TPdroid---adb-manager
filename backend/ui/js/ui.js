@@ -336,6 +336,35 @@ export function renderAdTable(entries, sdkVersionGetter) {
   });
 }
 
+export function renderUpdatePopover(info) {
+  const body = document.getElementById('update-popover-body');
+  const dot = document.getElementById('update-dot');
+  const hasUpdate = info.latest && info.current && info.latest !== info.current;
+
+  if (hasUpdate) {
+    const lang = i18n.getLang();
+    const notes = lang === 'es' ? info.notes_es : info.notes_en;
+    const changelogText = notes || info.changelog;
+
+    dot.classList.remove('hidden');
+    body.innerHTML = `
+      <div class="update-info-row">
+        <span class="update-info-label">${i18n.t('update.current', { current: info.current })}</span>
+        <span class="update-info-value">${info.current}</span>
+      </div>
+      <div class="update-info-row">
+        <span class="update-info-label">${i18n.t('update.latest', { latest: info.latest })}</span>
+        <span class="update-info-value"><span class="update-available-badge">${info.latest}</span></span>
+      </div>
+      ${info.download_url ? `<a href="${info.download_url}" class="update-download-btn" target="_blank" rel="noopener noreferrer">${i18n.t('update.download', { latest: info.latest })}</a>` : ''}
+      ${changelogText ? `<div class="update-changelog"><strong>${i18n.t('update.changelog')}:</strong><br>${changelogText}</div>` : ''}
+    `;
+  } else {
+    dot.classList.add('hidden');
+    body.innerHTML = `<div class="update-no-update">${i18n.t('update.none')}</div>`;
+  }
+}
+
 export function updateAppRow(pkg, notificationsDisabled) {
   const tbody = document.getElementById('apps-tbody');
   const rows = tbody.querySelectorAll('tr');

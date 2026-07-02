@@ -22,6 +22,20 @@
           <span>👤</span>
           <span class="navbar-username">Usuario</span>
         </div>
+        <div class="navbar-update-container">
+          <button id="update-bell" class="update-bell-btn" data-i18n-title="update.title">
+            <i class="fas fa-bell"></i>
+            <span id="update-dot" class="update-dot hidden"></span>
+          </button>
+          <div id="update-popover" class="update-popover hidden">
+            <div class="update-popover-header">
+              <span data-i18n="update.btn">Updates</span>
+            </div>
+            <div id="update-popover-body" class="update-popover-body">
+              <div class="update-loading">...</div>
+            </div>
+          </div>
+        </div>
         <div class="flex gap-2">
           <button id="lang-en" class="px-3 py-1 rounded text-sm font-medium lang-btn-inactive">EN</button>
           <button id="lang-es" class="px-3 py-1 rounded text-sm font-medium lang-btn-active">ES</button>

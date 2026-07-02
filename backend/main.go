@@ -10,13 +10,17 @@ import (
 	"strings"
 
 	"github.com/android-manager/backend/adb"
+	"github.com/android-manager/backend/cors"
 	"github.com/android-manager/backend/handlers"
 	"github.com/android-manager/backend/licensing"
+	"github.com/android-manager/backend/version"
 	"github.com/gin-gonic/gin"
 )
 
 //go:embed ui
 var frontendEmbed embed.FS
+
+var Version = "dev"
 
 func main() {
 	adbRel, err := adb.AdbBinaryPath()
@@ -36,8 +40,20 @@ func main() {
 
 	h := handlers.New(adbPath)
 
-	// ── Validación de licencia ─────────────────────────
+	// ── Worker URL ─────────────────────────────────────
 	workerURL := os.Getenv("LICENSE_WORKER_URL")
+
+	// ── Version cache + definitions fetcher ────────────
+	vc := version.NewCache(workerURL, Version)
+	h.VersionCache = vc
+
+	go func() {
+		if err := adb.FetchAndApplyRemoteDefinitions(workerURL); err != nil {
+			log.Printf("DEFINITIONS: %v", err)
+		}
+	}()
+
+	// ── Validación de licencia ─────────────────────────
 	licenseValid := false
 	if workerURL == "" {
 		licenseValid = true
@@ -50,12 +66,17 @@ func main() {
 	}
 
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Logger(), gin.Recovery(), cors.Middleware())
 
 	if !licenseValid {
 		r.Use(licensing.BlockMiddleware())
 	} else {
 		api := r.Group("/api")
+		api.GET("/session-token", func(c *gin.Context) {
+			c.JSON(200, gin.H{"token": cors.GetSessionToken()})
+		})
+		api.Use(cors.SessionTokenMiddleware())
 		{
 			api.GET("/status", h.GetStatus)
 			api.GET("/device", h.GetDevice)
@@ -68,6 +89,8 @@ func main() {
 			api.POST("/ads/block", h.BlockAdSource)
 			api.POST("/ads/unblock", h.UnblockAdSource)
 			api.POST("/ads/block-full", h.BlockAdSourceFull)
+			api.GET("/version", h.GetVersion)
+			api.GET("/definitions", h.GetDefinitions)
 		}
 
 		frontendFS, _ := fs.Sub(frontendEmbed, "ui")

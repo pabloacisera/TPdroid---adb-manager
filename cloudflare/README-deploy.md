@@ -103,6 +103,18 @@ curl -s -X POST "$WORKER_URL/revocar" \
 | `api_admin/` | `ADMIN_API_KEY` | clave a elección |
 | `activator/` (build) | `LICENSE_WORKER_URL` | URL del Worker (via ldflags) |
 
+Además, el Worker Cloudflare necesita estas variables de entorno para los endpoints `GET /version` y `GET /definitions`:
+
+```bash
+# Configurar con wrangler secret put
+wrangler secret put LATEST_VERSION    # ej: "0.2.0" — obligatorio post-release
+wrangler secret put CHANGELOG         # Notas genéricas (fallback si no hay bilingües) — opcional
+wrangler secret put NOTES_ES          # Notas en español — opcional
+wrangler secret put NOTES_EN          # Notas en inglés — opcional
+```
+
+La URL de descarga (`download_url`) está hardcodeada en el Worker y apunta a `github.com/.../releases/latest`. No necesita configurarse.
+
 Ejemplo de `.env` para el panel admin:
 
 ```bash

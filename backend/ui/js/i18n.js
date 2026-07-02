@@ -109,7 +109,15 @@ const translations = {
     'username.prompt': 'Welcome! What should we call you?',
     'username.placeholder': 'Your name',
     'username.save': 'Save',
-    'username.error': 'Please enter a name'
+    'username.error': 'Please enter a name',
+    'update.btn': 'Updates',
+    'update.title': 'Updates',
+    'update.available': 'New version {latest} available!',
+    'update.current': 'Current: {current}',
+    'update.latest': 'Latest: {latest}',
+    'update.download': 'Download {latest}',
+    'update.changelog': 'What\'s new',
+    'update.none': 'You\'re up to date'
   },
   es: {
     'app.title': 'TPdroid',
@@ -221,7 +229,15 @@ const translations = {
     'username.prompt': '¡Bienvenido! ¿Cómo deberíamos llamarte?',
     'username.placeholder': 'Tu nombre',
     'username.save': 'Guardar',
-    'username.error': 'Por favor ingresá un nombre'
+    'username.error': 'Por favor ingresá un nombre',
+    'update.btn': 'Actualizaciones',
+    'update.title': 'Actualizaciones',
+    'update.available': '¡Nueva versión {latest} disponible!',
+    'update.current': 'Actual: {current}',
+    'update.latest': 'Última: {latest}',
+    'update.download': 'Descargar {latest}',
+    'update.changelog': 'Novedades',
+    'update.none': 'Tenés la última versión'
   }
 };
 
@@ -244,6 +260,9 @@ export const i18n = {
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       el.placeholder = i18n.t(el.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      el.title = i18n.t(el.dataset.i18nTitle);
     });
   },
   getLang() { return currentLang; }

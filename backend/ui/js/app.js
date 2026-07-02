@@ -1,6 +1,6 @@
 import { api } from './api.js';
 import { i18n } from './i18n.js';
-import { showStep, setStepState, renderProcessTable, renderAppsTable, showError, clearError, showToast, renderPagination, showLoading, hideLoading, showEmpty, hideEmpty, showLegend, showPermissionsModal, hidePermissionsModal, renderAdTable, showChannelsModal, hideChannelsModal, updateAppRow } from './ui.js';
+import { showStep, setStepState, renderProcessTable, renderAppsTable, showError, clearError, showToast, renderPagination, showLoading, hideLoading, showEmpty, hideEmpty, showLegend, showPermissionsModal, hidePermissionsModal, renderAdTable, showChannelsModal, hideChannelsModal, updateAppRow, renderUpdatePopover } from './ui.js';
 
 const steps = ['prepare', 'connect', 'authorize', 'dashboard'];
 let currentStep = 0;
@@ -57,8 +57,9 @@ function pollUntil(apiFn, conditionFn, intervalMs, timeoutMs, onSuccess, onTimeo
         stopPolling();
         onSuccess(data);
       }
-    } catch (e) {
-    }
+  } catch (e) {
+    console.warn('Version check failed (network or API error):', e);
+  }
   }, intervalMs);
 }
 
@@ -280,6 +281,7 @@ async function checkConnection() {
       }
     }
   } catch (e) {
+    console.warn('Heartbeat check failed:', e);
   }
 }
 
@@ -465,6 +467,7 @@ document.getElementById('channels-modal').addEventListener('click', (e) => {
 });
 
 async function initApp() {
+  await api.initSessionToken();
   try {
     const status = await api.getStatus();
     if (status.connected) {
@@ -480,6 +483,7 @@ async function initApp() {
       return;
     }
   } catch (e) {
+    console.warn('initApp: backend not ready yet, showing connection screen:', e);
   }
   goToStep(0);
 }
@@ -547,6 +551,55 @@ langEs.addEventListener('click', () => {
   document.documentElement.lang = 'es';
 });
 updateLangButtons('es');
+
+// ── Version check ────────────────────────────────────
+let versionInfo = null;
+let versionTimer = null;
+
+async function checkVersion() {
+  try {
+    versionInfo = await api.getVersionInfo();
+    renderUpdatePopover(versionInfo);
+  } catch (e) {
+    console.warn('Version check failed (network or API error):', e);
+  }
+}
+
+function startVersionPolling() {
+  stopVersionPolling();
+  checkVersion();
+  versionTimer = setInterval(checkVersion, 30 * 60 * 1000);
+}
+
+function stopVersionPolling() {
+  if (versionTimer) {
+    clearInterval(versionTimer);
+    versionTimer = null;
+  }
+}
+
+document.getElementById('update-bell').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const popover = document.getElementById('update-popover');
+  popover.classList.toggle('hidden');
+  if (!popover.classList.contains('hidden') && versionInfo) {
+    renderUpdatePopover(versionInfo);
+  }
+});
+
+document.addEventListener('click', () => {
+  const popover = document.getElementById('update-popover');
+  if (!popover.classList.contains('hidden')) {
+    popover.classList.add('hidden');
+  }
+});
+
+document.getElementById('update-popover').addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+// Start version polling on init (runs even if not in dashboard)
+startVersionPolling();
 
 setupSearch('search-processes', state.processes, filterAndRenderProcesses);
 setupSearch('search-apps', state.apps, filterAndRenderApps);

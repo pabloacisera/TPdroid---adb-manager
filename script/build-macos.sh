@@ -16,18 +16,19 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DIST_DIR="$SCRIPT_DIR/dist"
 WORKER_URL="${LICENSE_WORKER_URL:-https://tpdroid-licencias.testdeveloperrandom.workers.dev}"
+VERSION="${VERSION:-dev}"
 
 command -v go >/dev/null 2>&1 || { echo "Error: go no instalado"; exit 1; }
 mkdir -p "$DIST_DIR"
 
 # ── Compilar backend ─────────────────────────────────
-echo "Compilando tpdroid para macOS (amd64)..."
+echo "Compilando tpdroid para macOS amd64 (v${VERSION})..."
 cd "$SCRIPT_DIR/backend"
-GOOS=darwin GOARCH=amd64 go build -o "$DIST_DIR/tpdroid-macos-amd64" .
+GOOS=darwin GOARCH=amd64 go build -ldflags="-X main.Version=${VERSION}" -o "$DIST_DIR/tpdroid-macos-amd64" .
 echo "-> $DIST_DIR/tpdroid-macos-amd64"
 
-echo "Compilando tpdroid para macOS (arm64 / Apple Silicon)..."
-GOOS=darwin GOARCH=arm64 go build -o "$DIST_DIR/tpdroid-macos-arm64" .
+echo "Compilando tpdroid para macOS arm64 / Apple Silicon (v${VERSION})..."
+GOOS=darwin GOARCH=arm64 go build -ldflags="-X main.Version=${VERSION}" -o "$DIST_DIR/tpdroid-macos-arm64" .
 echo "-> $DIST_DIR/tpdroid-macos-arm64"
 
 # ── Universal binary (lipo) — solo si se compila desde macOS ──────────────
